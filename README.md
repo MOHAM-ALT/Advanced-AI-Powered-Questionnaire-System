@@ -1,133 +1,129 @@
 # 🔍 Advanced OSINT Intelligence System v2.0
 ## Professional-Grade Intelligence Gathering Platform
 
-[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
-[![Version](https://img.shields.io/badge/Version-2.0.0-orange.svg)]()
 
-> 🚀 **نظام الاستخبارات الذكي المتطور** - حل شامل لجمع وتحليل المعلومات من مصادر متعددة باستخدام الذكاء الاصطناعي المحلي
+> 🚀 **Advanced Intelligent Intelligence System** - A comprehensive solution for gathering and analyzing information from multiple sources using local artificial intelligence
 
 ---
 
-## 🌟 المميزات الثورية الجديدة
+## 🌟 Revolutionary New Features
 
-### 🧠 الذكاء الاصطناعي المحلي المُحسَّن
-- **نماذج AI محلية خفيفة** تعمل على 2-3 GB RAM فقط
-- **تحليل نصي ذكي** باستخدام نماذج BERT مُحسَّنة للعربية والإنجليزية
-- **تصنيف تلقائي** لأنواع الأعمال والقطاعات بدقة 95%+
-- **استخراج الكيانات** (أسماء، أماكن، منظمات) تلقائياً
-- **تحليل المشاعر** لتقييم السمعة والآراء
+### 🧠 Enhanced Local Artificial Intelligence
+- **Lightweight local AI models** running on only 2-3 GB RAM
+- **Intelligent text analysis** using BERT models optimized for Arabic and English
+- **Automatic classification** of business types and sectors with 95%+ accuracy
+- **Entity extraction** (names, places, organizations) automatically
+- **Sentiment analysis** for reputation and opinion assessment
 
-### 🌐 تكامل مع أحدث أدوات OSINT 2024-2025
-- **VenariX Integration**: مراقبة التهديدات مع تحديثات Telegram فورية
-- **Social Links Crimewall**: الوصول لـ 500+ مصدر مع 1700+ طريقة استخراج
-- **OSINT Industries Platform**: دقة 100% مع تصور جغرافي ديناميكي
-- **Multi-Engine Search**: تكامل ذكي مع Google, Bing, DuckDuckGo
-- **Advanced Graph Database**: Neo4j للعلاقات المعقدة بسرعة فائقة
+### 🌐 Integration with Latest OSINT Tools 2024-2025
+- **VenariX Integration**: threat monitoring with instant Telegram updates
+- **Social Links Crimewall**: access to 500+ sources with 1700+ extraction methods
+- **OSINT Industries Platform**: 100% accuracy with dynamic geographic visualization
+- **Multi-Engine Search**: intelligent integration with Google, Bing, DuckDuckGo
+- **Advanced Graph Database**: Neo4j for complex relationships at blazing speed
 
-### 📊 قواعد البيانات المتطورة
-- **Neo4j Graph Database**: تحليل العلاقات بسرعة 500 ضعف من التقليدية
-- **Elasticsearch Integration**: بحث فوري في ملايين السجلات
-- **SQLite محسّن**: قاعدة بيانات محلية سريعة مع فهرسة ذكية
-- **Data Lake Architecture**: تخزين مرن للبيانات المختلطة
+### 📊 Advanced Databases
+- **Neo4j Graph Database**: relationship analysis 500x faster than traditional
+- **Elasticsearch Integration**: instant search across millions of records
+- **Enhanced SQLite**: fast local database with intelligent indexing
+- **Data Lake Architecture**: flexible storage for mixed data
 
-### 🔒 الأمان والخصوصية المتقدمة
-- **معالجة محلية 100%**: لا تخرج البيانات من جهازك أبداً
-- **تشفير AES-256**: حماية قصوى للبيانات المحفوظة
-- **إخفاء الهوية الذكي**: rotation تلقائي للـ User Agents
-- **Proxy Management**: دعم شامل للبروكسي مع اختبار الصحة
-- **Rate Limiting ذكي**: تجنب الحظر مع تحكم دقيق
+### 🔒 Advanced Security and Privacy
+- **100% local processing**: data never leaves your device
+- **AES-256 encryption**: maximum protection for stored data
+- **Intelligent anonymization**: automatic User Agent rotation
+- **Proxy Management**: comprehensive proxy support with health testing
+- **Intelligent Rate Limiting**: avoid blocking with precise control
 
 ---
 
-## 🎯 حالات الاستخدام الاحترافية
+## 🎯 Professional Use Cases
 
-### 💼 توليد العملاء المحتملين (Lead Generation)
+### 💼 Lead Generation
 ```
-🎯 الهدف: "شركات التكنولوجيا في الرياض"
+🎯 Target: "Technology companies in Riyadh"
 
-🤖 الذكاء الاصطناعي يحدد تلقائياً:
-├── نوع البحث: B2B Technology Sector
-├── المصادر الأمثل: LinkedIn + Google Business + Directories
-├── الكلمات المفتاحية: ["software", "tech", "IT", "الرياض", "تقنية"]
-└── أولويات البيانات: [Contact Info, Decision Makers, Company Size]
+🤖 AI automatically determines:
+├── Search type: B2B Technology Sector
+├── Optimal sources: LinkedIn + Google Business + Directories
+├── Keywords: ["software", "tech", "IT", "Riyadh", "technology"]
+└── Data priorities: [Contact Info, Decision Makers, Company Size]
 
-📈 النتائج المتوقعة:
-• 200+ شركة تقنية مع معلومات كاملة
-• 500+ صانع قرار مع بيانات الاتصال
-• تحليل ذكي للسوق والمنافسة
-• تقييم جودة العملاء المحتملين
-```
-
-### 🎯 التوظيف الذكي (AI-Powered Recruitment)
-```
-🎯 الهدف: "مطورين Python عاطلين في السعودية"
-
-🤖 استراتيجية الذكاء الاصطناعي:
-├── مصادر البحث: LinkedIn Jobs + Indeed + Bayt + GitHub
-├── تحليل المهارات: Python, Django, Flask, API Development
-├── تقييم الخبرة: 2-10 سنوات حسب المتطلبات
-└── مؤشرات التوفر: "Looking for work", "Available", "Open to opportunities"
-
-
-🎯 النتائج الذكية:
-• 150+ مطور مؤهل مع تحليل المهارات
-• تقييم مستوى الخبرة والمشاريع
-• معلومات الاتصال المحققة
-• تحليل توقعات الراتب
+📈 Expected results:
+• 200+ tech companies with complete information
+• 500+ decision makers with contact data
+• Intelligent market and competition analysis
+• Lead quality assessment
 ```
 
-### 📊 بحوث السوق المتقدمة (Market Intelligence)
+### 🎯 AI-Powered Recruitment
 ```
-🎯 الهدف: "مطاعم إيطالية في جدة"
+🎯 Target: "Unemployed Python developers in Saudi Arabia"
 
-🤖 التحليل الشامل:
-├── Google Maps: استخراج جميع المطاعم الإيطالية
-├── Review Analysis: تحليل التقييمات والآراء
-├── Competitor Analysis: تحليل المنافسة والأسعار
-├── Social Media: نشاط وسائل التواصل
-└── Trend Analysis: اتجاهات السوق والفرص
+🤖 AI strategy:
+├── Search sources: LinkedIn Jobs + Indeed + Bayt + GitHub
+├── Skill analysis: Python, Django, Flask, API Development
+├── Experience evaluation: 2-10 years based on requirements
+└── Availability indicators: "Looking for work", "Available", "Open to opportunities"
 
-📊 التقرير الذكي:
-• 50+ مطعم إيطالي مع تحليل شامل
-• خريطة المنافسة والفجوات السوقية
-• تحليل المشاعر وآراء العملاء
-• فرص الاستثمار والتوسع
+🎯 Intelligent results:
+• 150+ qualified developers with skill analysis
+• Experience level and project assessment
+• Verified contact information
+• Salary expectation analysis
+```
+
+### 📊 Advanced Market Intelligence
+```
+🎯 Target: "Italian restaurants in Jeddah"
+
+🤖 Comprehensive analysis:
+├── Google Maps: extract all Italian restaurants
+├── Review Analysis: analyze ratings and opinions
+├── Competitor Analysis: competition and pricing analysis
+├── Social Media: social media activity
+└── Trend Analysis: market trends and opportunities
+
+📊 Intelligent report:
+• 50+ Italian restaurants with comprehensive analysis
+• Competition map and market gaps
+• Sentiment analysis and customer opinions
+• Investment and expansion opportunities
 ```
 
 ---
 
-## 🔧 التقنيات الأساسية المُحسَّنة
+## 🔧 Enhanced Core Technologies
 
-### 🧠 الذكاء الاصطناعي المحلي (Resource-Optimized AI)
+### 🧠 Local Artificial Intelligence (Resource-Optimized AI)
 ```python
-# نماذج AI محلية خفيفة
+# Lightweight local AI models
 Local AI Models:
 ├── 📝 Text Analysis: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 (420MB)
 ├── 🔤 NER (Named Entity Recognition): ar_core_news_sm + en_core_web_sm (100MB)
-├── 📊 Classification: Custom BERT-tiny للتصنيف (50MB)
+├── 📊 Classification: Custom BERT-tiny for classification (50MB)
 ├── 💭 Sentiment Analysis: cardiffnlp/twitter-roberta-base-sentiment (500MB)
-└── 🏷️ Topic Modeling: BERTopic مع sentence-transformers (300MB)
+└── 🏷️ Topic Modeling: BERTopic with sentence-transformers (300MB)
 
 Total RAM Usage: 1.5-2.5 GB
 Performance: 90%+ accuracy on business data
 ```
-الذكاء الاصطناعي للعلاقات
 
-تنبؤ الانتقالات: من سينتقل أين ومتى؟
-اكتشاف الأنماط: كيف تتشكل الشبكات الناجحة؟
-توقع التعاونات: أي الشراكات أكثر احتمالاً؟
-تحليل التأثير: كيف تنتشر الأفكار والقرارات؟
+Relationship AI
 
-📈 التطوير المستمر
+Transition prediction: who will move where and when?
+Pattern discovery: how do successful networks form?
+Collaboration prediction: which partnerships are most likely?
+Impact analysis: how do ideas and decisions spread?
 
-خوارزميات أذكى للبحث والاستكشاف
-تحليل أعمق للسلوكيات والأنماط
-تنبؤات أدق للتطورات المستقبلية
-واجهات أكثر تفاعلية لاستكشاف الشبكات
+📈 Continuous Development
 
-### 🌐 محركات البحث المتطورة
+Smarter algorithms for search and exploration
+Deeper analysis of behaviors and patterns
+More accurate predictions of future developments
+More interactive interfaces for network exploration
+
+### 🌐 Advanced Search Engines
 ```python
 Advanced Search Engines:
 ├── 🔍 Google Dorking Engine
@@ -149,7 +145,7 @@ Advanced Search Engines:
     └── OSINT Industries geospatial analysis
 ```
 
-### 📊 قواعد البيانات المتطورة
+### 📊 Advanced Databases
 ```python
 Database Architecture:
 ├── 🕸️ Neo4j Graph Database
@@ -175,93 +171,93 @@ Database Architecture:
 
 ---
 
-## 🚀 الهيكل التقني المحدث
+## 🚀 Updated Technical Structure
 
 ```
 AdvancedOSINT_v2.0/
-├── 📄 main.py                           # 🎯 نقطة الدخول الذكية
-├── 📄 quick_start.bat                   # 🚀 البدء السريع المحسن
-├── 📄 requirements.txt                  # 📦 المتطلبات المحدثة
+├── 📄 main.py                           # 🎯 Intelligent entry point
+├── 📄 quick_start.bat                   # 🚀 Enhanced quick start
+├── 📄 requirements.txt                  # 📦 Updated requirements
 │
-├── 📁 core/                             # 🧠 النواة الذكية
-│   ├── 📄 questionnaire.py              # ✅ الاستبيان الذكي المتطور
-│   ├── 📄 discovery_engine.py           # 🔄 محرك الاستكشاف الجديد
-│   ├── 📄 ai_analyzer.py                # 🤖 محلل الذكاء الاصطناعي المحلي
-│   ├── 📄 data_validator.py             # ✅ مُدقق البيانات المتقدم
-│   └── 📄 database_manager.py           # 🗄️ مدير قواعد البيانات المحسن
+├── 📁 core/                             # 🧠 Intelligent core
+│   ├── 📄 questionnaire.py              # ✅ Advanced intelligent questionnaire
+│   ├── 📄 discovery_engine.py           # 🔄 New discovery engine
+│   ├── 📄 ai_analyzer.py                # 🤖 Local AI analyzer
+│   ├── 📄 data_validator.py             # ✅ Advanced data validator
+│   └── 📄 database_manager.py           # 🗄️ Enhanced database manager
 │
-├── 📁 collectors/                       # 🌐 جامعات البيانات المتطورة
-│   ├── 📄 search_engines.py             # 🔍 محركات البحث الذكية
-│   ├── 📄 social_media.py               # 📱 وسائل التواصل المتقدمة
-│   ├── 📄 business_directories.py       # 🏢 أدلة الأعمال الشاملة
-│   ├── 📄 job_portals.py                # 💼 مواقع التوظيف الذكية
-│   ├── 📄 osint_tools.py                # 🛠️ أدوات OSINT المتخصصة
-│   └── 📄 news_monitoring.py            # 📰 مراقبة الأخبار الفورية
+├── 📁 collectors/                       # 🌐 Advanced data collectors
+│   ├── 📄 search_engines.py             # 🔍 Intelligent search engines
+│   ├── 📄 social_media.py               # 📱 Advanced social media
+│   ├── 📄 business_directories.py       # 🏢 Comprehensive business directories
+│   ├── 📄 job_portals.py                # 💼 Intelligent job portals
+│   ├── 📄 osint_tools.py                # 🛠️ Specialized OSINT tools
+│   └── 📄 news_monitoring.py            # 📰 Real-time news monitoring
 │
-├── 📁 ai_models/                        # 🧠 النماذج الذكية المحلية
-│   ├── 📁 text_analysis/               # 📝 تحليل النصوص
-│   ├── 📁 classification/              # 🏷️ التصنيف التلقائي
-│   ├── 📁 entity_extraction/           # 🎯 استخراج الكيانات
-│   └── 📁 sentiment_analysis/          # 💭 تحليل المشاعر
+├── 📁 ai_models/                        # 🧠 Local intelligent models
+│   ├── 📁 text_analysis/               # 📝 Text analysis
+│   ├── 📁 classification/              # 🏷️ Automatic classification
+│   ├── 📁 entity_extraction/           # 🎯 Entity extraction
+│   └── 📁 sentiment_analysis/          # 💭 Sentiment analysis
 │
-├── 📁 databases/                        # 🗃️ قواعد البيانات المتعددة
-│   ├── 📄 neo4j_manager.py             # 🕸️ إدارة قاعدة الرسم البياني
-│   ├── 📄 elasticsearch_manager.py     # 🔍 إدارة البحث المتقدم
-│   └── 📄 sqlite_enhanced.py           # 🗄️ SQLite المحسن
+├── 📁 databases/                        # 🗃️ Multiple databases
+│   ├── 📄 neo4j_manager.py             # 🕸️ Graph database management
+│   ├── 📄 elasticsearch_manager.py     # 🔍 Advanced search management
+│   └── 📄 sqlite_enhanced.py           # 🗄️ Enhanced SQLite
 │
-├── 📁 integrations/                     # 🔗 التكاملات المتقدمة
-│   ├── 📄 venarx_connector.py          # 🛡️ تكامل VenariX
+├── 📁 integrations/                     # 🔗 Advanced integrations
+│   ├── 📄 venarx_connector.py          # 🛡️ VenariX integration
 │   ├── 📄 sociallinks_api.py           # 🌐 Social Links API
 │   ├── 📄 osint_industries.py          # 🏭 OSINT Industries
-│   └── 📄 threat_feeds.py              # ⚠️ تغذيات التهديدات
+│   └── 📄 threat_feeds.py              # ⚠️ Threat feeds
 │
-├── 📁 utils/                            # 🛠️ الأدوات المساعدة المحسنة
-│   ├── 📄 local_ai_engine.py           # 🤖 محرك الذكاء الاصطناعي المحلي
-│   ├── 📄 rate_limiter.py              # ⚡ تحديد المعدل الذكي
-│   ├── 📄 proxy_manager.py             # 🔒 إدارة البروكسي المتقدمة
-│   ├── 📄 data_encryption.py           # 🔐 التشفير المتقدم
-│   └── 📄 performance_monitor.py       # 📊 مراقب الأداء
+├── 📁 utils/                            # 🛠️ Enhanced utility tools
+│   ├── 📄 local_ai_engine.py           # 🤖 Local AI engine
+│   ├── 📄 rate_limiter.py              # ⚡ Intelligent rate limiting
+│   ├── 📄 proxy_manager.py             # 🔒 Advanced proxy management
+│   ├── 📄 data_encryption.py           # 🔐 Advanced encryption
+│   └── 📄 performance_monitor.py       # 📊 Performance monitor
 │
-├── 📁 config/                           # ⚙️ الإعدادات المتقدمة
-│   ├── 📄 ai_models.json               # 🧠 إعدادات النماذج الذكية
-│   ├── 📄 osint_sources.json           # 🌐 مصادر OSINT المحدثة
-│   ├── 📄 patterns.json                # 🔍 أنماط البحث المتطورة
-│   └── 📄 security.json                # 🔒 إعدادات الأمان
+├── 📁 config/                           # ⚙️ Advanced settings
+│   ├── 📄 ai_models.json               # 🧠 Intelligent model settings
+│   ├── 📄 osint_sources.json           # 🌐 Updated OSINT sources
+│   ├── 📄 patterns.json                # 🔍 Advanced search patterns
+│   └── 📄 security.json                # 🔒 Security settings
 │
-├── 📁 data/                             # 📊 البيانات والمخرجات
-│   ├── 📁 models/                       # 🧠 النماذج المحلية المحملة
-│   ├── 📁 cache/                        # ⚡ التخزين المؤقت الذكي
-│   ├── 📁 graphs/                       # 🕸️ قواعد بيانات الرسم البياني
-│   └── 📁 exports/                      # 📤 التقارير والتصديرات
+├── 📁 data/                             # 📊 Data and outputs
+│   ├── 📁 models/                       # 🧠 Downloaded local models
+│   ├── 📁 cache/                        # ⚡ Intelligent caching
+│   ├── 📁 graphs/                       # 🕸️ Graph databases
+│   └── 📁 exports/                      # 📤 Reports and exports
 │
-└── 📁 reports/                          # 📋 نظام التقارير المتطور
-    ├── 📄 intelligence_report.py        # 📊 تقارير الاستخبارات
-    ├── 📄 graph_visualizer.py           # 🎨 مصور الشبكات
-    └── 📄 analytics_dashboard.py        # 📈 لوحة التحليلات
+└── 📁 reports/                          # 📋 Advanced reporting system
+    ├── 📄 intelligence_report.py        # 📊 Intelligence reports
+    ├── 📄 graph_visualizer.py           # 🎨 Network visualizer
+    └── 📄 analytics_dashboard.py        # 📈 Analytics dashboard
 ```
 
 ---
 
-## ⚡ الأداء والكفاءة
+## ⚡ Performance and Efficiency
 
-### 💻 متطلبات النظام المُحسَّنة
+### 💻 Enhanced System Requirements
 ```
-الحد الأدنى (للتشغيل الأساسي):
-├── RAM: 2 GB (يشمل نموذج AI محلي)
-├── المعالج: Intel i3 أو AMD Ryzen 3
-├── التخزين: 5 GB مساحة فارغة
-├── الإنترنت: اتصال مستقر (1 Mbps+)
-└── نظام التشغيل: Windows 10/11, Linux, macOS
+Minimum Requirements (for basic operation):
+├── RAM: 2 GB (includes local AI model)
+├── Processor: Intel i3 or AMD Ryzen 3
+├── Storage: 5 GB free space
+├── Internet: Stable connection (1 Mbps+)
+└── OS: Windows 10/11, Linux, macOS
 
-الموصى به (للأداء الأمثل):
-├── RAM: 4-8 GB (للنماذج المتعددة)
-├── المعالج: Intel i5 أو AMD Ryzen 5
-├── التخزين: 10 GB SSD
-├── الإنترنت: اتصال عالي السرعة (10+ Mbps)
-└── GPU: اختياري لتسريع AI (GTX 1060+)
+Recommended (for optimal performance):
+├── RAM: 4-8 GB (for multiple models)
+├── Processor: Intel i5 or AMD Ryzen 5
+├── Storage: 10 GB SSD
+├── Internet: High-speed connection (10+ Mbps)
+└── GPU: Optional for AI acceleration (GTX 1060+)
 ```
 
-### 🚀 تحسينات الأداء
+### 🚀 Performance Optimizations
 ```python
 Performance Optimizations:
 ├── 🧠 Local AI Models
@@ -288,73 +284,73 @@ Performance Optimizations:
 
 ---
 
-## 🔧 التثبيت والإعداد السريع
+## 🔧 Quick Installation and Setup
 
-### 📦 التثبيت التلقائي (الموصى به)
+### 📦 Automatic Installation (Recommended)
 ```batch
-# Windows - البدء السريع
+# Windows - Quick Start
 git clone https://github.com/your-repo/AdvancedOSINT-v2.0.git
 cd AdvancedOSINT-v2.0
 ./quick_start.bat
 
-# سيقوم البرنامج تلقائياً بـ:
-# ✅ تثبيت Python dependencies
-# ✅ تحميل نماذج AI المحلية المحسنة
-# ✅ إعداد قواعد البيانات
-# ✅ تكوين الأمان والخصوصية
-# ✅ اختبار التكاملات
+# The program will automatically:
+# ✅ Install Python dependencies
+# ✅ Download optimized local AI models
+# ✅ Setup databases
+# ✅ Configure security and privacy
+# ✅ Test integrations
 ```
 
-### 🐍 التثبيت اليدوي
+### 🐍 Manual Installation
 ```bash
-# 1. استنساخ المشروع
+# 1. Clone the project
 git clone https://github.com/your-repo/AdvancedOSINT-v2.0.git
 cd AdvancedOSINT-v2.0
 
-# 2. إنشاء بيئة افتراضية
+# 2. Create virtual environment
 python -m venv osint_env
 source osint_env/bin/activate  # Linux/Mac
-# أو
+# or
 osint_env\Scripts\activate     # Windows
 
-# 3. تثبيت المتطلبات الأساسية
+# 3. Install basic requirements
 pip install -r requirements.txt
 
-# 4. تحميل نماذج AI المحلية (خفيفة)
+# 4. Download local AI models (lightweight)
 python setup_ai_models.py
 
-# 5. إعداد قواعد البيانات
+# 5. Setup databases
 python setup_databases.py
 
-# 6. تشغيل النظام
+# 6. Run the system
 python main.py
 ```
 
 ---
 
-## 🎮 دليل الاستخدام السريع
+## 🎮 Quick Usage Guide
 
-### 🚀 البدء السريع
+### 🚀 Quick Start
 ```python
-# تشغيل الوضع التفاعلي
+# Run interactive mode
 python main.py
 
-# أو البحث المباشر
-python main.py --target "شركات التقنية في الرياض" --context lead_generation
+# Or direct search
+python main.py --target "technology companies in Riyadh" --context lead_generation
 
-# أو الوضع المجمع
+# Or batch mode
 python main.py --batch targets.txt --output results/
 ```
 
-### 🧠 تخصيص الذكاء الاصطناعي
+### 🧠 AI Customization
 ```python
-# إعدادات AI محلية في config/ai_models.json
+# Local AI settings in config/ai_models.json
 {
     "text_analysis": {
         "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         "max_length": 512,
         "batch_size": 16,
-        "device": "cpu"  # أو "cuda" للـ GPU
+        "device": "cpu"  # or "cuda" for GPU
     },
     "classification": {
         "business_types": {
@@ -371,32 +367,32 @@ python main.py --batch targets.txt --output results/
 }
 ```
 
-### 🔍 أمثلة البحث المتقدم
+### 🔍 Advanced Search Examples
 ```python
-# 1. توليد العملاء المحتملين
+# 1. Lead generation
 python main.py
-> اختر: "1. Guided Investigation"
-> السياق: "Lead Generation"
-> الهدف: "شركات الذكاء الاصطناعي في السعودية"
+> Choose: "1. Guided Investigation"
+> Context: "Lead Generation"
+> Target: "AI companies in Saudi Arabia"
 
-# 2. التوظيف الذكي
+# 2. Intelligent recruitment
 python main.py --quick
-> الهدف: "Python developers looking for work in Riyadh"
-> النتائج: 150+ مطور مع تحليل المهارات
+> Target: "Python developers looking for work in Riyadh"
+> Results: 150+ developers with skill analysis
 
-# 3. بحوث السوق
+# 3. Market research
 python main.py --context market_research
-> الهدف: "coffee shops in Jeddah competitors analysis"
-> النتائج: تحليل شامل للسوق والمنافسة
+> Target: "coffee shops in Jeddah competitors analysis"
+> Results: Comprehensive market and competition analysis
 ```
 
 ---
 
-## 🛠️ التكاملات المتقدمة
+## 🛠️ Advanced Integrations
 
-### 🌐 أدوات OSINT الخارجية
+### 🌐 External OSINT Tools
 ```python
-# VenariX Integration - مراقبة التهديدات
+# VenariX Integration - threat monitoring
 venarx_config = {
     "api_key": "your_api_key",
     "telegram_alerts": True,
@@ -404,26 +400,26 @@ venarx_config = {
     "auto_update": True
 }
 
-# Social Links Crimewall - 500+ مصدر
+# Social Links Crimewall - 500+ sources
 sociallinks_config = {
     "access_token": "your_token",
     "sources": ["social_media", "darkweb", "forums", "messaging"],
-    "extraction_methods": 1700,  # جميع الطرق المتاحة
+    "extraction_methods": 1700,  # all available methods
     "realtime_monitoring": True
 }
 
-# OSINT Industries - تحليل جغرافي
+# OSINT Industries - geographic analysis
 osint_industries_config = {
     "api_endpoint": "https://api.osint.industries",
     "geospatial_analysis": True,
     "timeline_visualization": True,
-    "accuracy": 100  # دقة 100%
+    "accuracy": 100  # 100% accuracy
 }
 ```
 
-### 📊 قواعد البيانات المتطورة
+### 📊 Advanced Databases
 ```python
-# Neo4j Graph Database - للعلاقات المعقدة
+# Neo4j Graph Database - for complex relationships
 neo4j_config = {
     "uri": "bolt://localhost:7687",
     "performance_mode": "high_performance",
@@ -439,7 +435,7 @@ neo4j_config = {
     }
 }
 
-# Elasticsearch - للبحث المتقدم
+# Elasticsearch - for advanced search
 elasticsearch_config = {
     "host": "localhost:9200",
     "indices": {
@@ -455,9 +451,9 @@ elasticsearch_config = {
 }
 ```
 
-### 🤖 نماذج AI المحلية
+### 🤖 Local AI Models
 ```python
-# إعداد نماذج AI محسنة للموارد المحدودة
+# Resource-optimized AI model setup
 local_ai_config = {
     "text_models": {
         "multilingual_embeddings": {
@@ -484,9 +480,9 @@ local_ai_config = {
 
 ---
 
-## 📊 النتائج والتقارير المتطورة
+## 📊 Advanced Results and Reports
 
-### 📈 لوحة التحليلات الذكية
+### 📈 Intelligent Analytics Dashboard
 ```python
 Analytics Dashboard Features:
 ├── 🎯 Real-time Intelligence Feed
@@ -511,7 +507,7 @@ Analytics Dashboard Features:
     └── Follow-up recommendations
 ```
 
-### 📄 تقارير احترافية متعددة الصيغ
+### 📄 Professional Multi-Format Reports
 ```python
 Report Formats:
 ├── 📊 Interactive HTML
@@ -543,9 +539,9 @@ Report Formats:
 
 ---
 
-## 🔒 الأمان والخصوصية المتقدمة
+## 🔒 Advanced Security and Privacy
 
-### 🛡️ حماية البيانات
+### 🛡️ Data Protection
 ```python
 Security Features:
 ├── 🔐 Encryption at Rest
@@ -570,7 +566,7 @@ Security Features:
     └── Audit trail maintenance
 ```
 
-### 🏠 معالجة محلية 100%
+### 🏠 100% Local Processing
 ```python
 Local Processing Benefits:
 ├── 🔒 Data Never Leaves Your Device
@@ -597,152 +593,152 @@ Local Processing Benefits:
 
 ---
 
-## 🔄 خطة التطوير والتحديثات
+## 🔄 Development Roadmap and Updates
 
-### 📅 المرحلة الحالية (Q1 2025)
+### 📅 Current Phase (Q1 2025)
 ```
-✅ المكتملة:
-├── نظام الاستبيان الذكي المتطور
-├── قاعدة البيانات المحسنة مع Neo4j
-├── محركات البحث الذكية
-├── نماذج AI محلية محسنة
-├── تكاملات OSINT متقدمة
-├── نظام الأمان والتشفير
-└── واجهة المستخدم التفاعلية
+✅ Completed:
+├── Advanced intelligent questionnaire system
+├── Enhanced database with Neo4j
+├── Intelligent search engines
+├── Optimized local AI models
+├── Advanced OSINT integrations
+├── Security and encryption system
+└── Interactive user interface
 
-🔄 قيد التطوير:
-├── تحسين أداء معالجة البيانات الضخمة
-├── إضافة مصادر OSINT جديدة
-├── تطوير نماذج AI مخصصة للمنطقة
-└── تحسين واجهة الرسوم البيانية
+🔄 In Development:
+├── Big data processing performance improvement
+├── Adding new OSINT sources
+├── Developing region-specific AI models
+└── Improving graph interface
 ```
 
-### 🚀 المراحل القادمة (Q2-Q4 2025)
+### 🚀 Upcoming Phases (Q2-Q4 2025)
 ```
 Q2 2025:
-├── 🌐 تكامل Advanced Web Scraping
-├── 📱 تطبيق مكتبي مع GUI
-├── 🔄 تحديثات تلقائية للمصادر
-└── 📊 تحليلات تنبؤية متقدمة
+├── 🌐 Advanced Web Scraping integration
+├── 📱 Desktop application with GUI
+├── 🔄 Automatic source updates
+└── 📊 Advanced predictive analytics
 
 Q3 2025:
-├── 🤖 وكلاء AI ذاتيون للمراقبة
-├── 🌍 دعم مصادر إقليمية إضافية
-├── 📈 تحليل الاتجاهات الزمنية
-└── 🔗 API عام للتكامل الخارجي
+├── 🤖 Autonomous AI agents for monitoring
+├── 🌍 Additional regional source support
+├── 📈 Temporal trend analysis
+└── 🔗 Public API for external integration
 
 Q4 2025:
-├── 🧠 نماذج AI مدربة على بيانات إقليمية
-├── 🎯 تخصص أعمق لأسواق الشرق الأوسط
-├── 🌐 تكامل مع منصات حكومية مفتوحة
-└── 📱 تطبيق محمول للمراقبة الفورية
+├── 🧠 AI models trained on regional data
+├── 🎯 Deeper specialization for Middle East markets
+├── 🌐 Integration with open government platforms
+└── 📱 Mobile app for instant monitoring
 ```
 
 ---
 
-## 🎓 دليل الاستخدام التفصيلي
+## 🎓 Detailed Usage Guide
 
-### 🔍 سيناريوهات البحث المتقدمة
+### 🔍 Advanced Search Scenarios
 
-#### 💼 سيناريو 1: توليد العملاء المحتملين (Lead Generation)
+#### 💼 Scenario 1: Lead Generation
 ```
-🎯 المهمة: "البحث عن شركات التقنية المالية في الخليج"
+🎯 Mission: "Search for fintech companies in the Gulf"
 
-📋 خطوات العمل:
-1️⃣ بدء الاستبيان الذكي
-   ├── السياق: Lead Generation
-   ├── الصناعة: Financial Technology
-   ├── المنطقة: GCC Countries
-   └── الجمهور: B2B Enterprise
+📋 Workflow:
+1️⃣ Start intelligent questionnaire
+   ├── Context: Lead Generation
+   ├── Industry: Financial Technology
+   ├── Region: GCC Countries
+   └── Audience: B2B Enterprise
 
-2️⃣ التحليل الذكي التلقائي
-   ├── 🤖 AI يحدد: "fintech, financial technology, banking tech"
-   ├── 🌐 مصادر مثلى: LinkedIn + Crunchbase + Local directories
-   ├── 🎯 تركيز: Decision makers + Contact info + Company size
-   └── ⚡ معالجة متوازية عبر 5+ مصادر
+2️⃣ Automatic intelligent analysis
+   ├── 🤖 AI determines: "fintech, financial technology, banking tech"
+   ├── 🌐 Optimal sources: LinkedIn + Crunchbase + Local directories
+   ├── 🎯 Focus: Decision makers + Contact info + Company size
+   └── ⚡ Parallel processing across 5+ sources
 
-3️⃣ النتائج المتوقعة (15-30 دقيقة)
-   ├── 📊 100+ شركة fintech مع تحليل شامل
-   ├── 👥 300+ صانع قرار مع معلومات الاتصال
-   ├── 💰 تحليل حجم السوق والفرص
-   ├── 🔍 خريطة المنافسة والثغرات
-   └── 📈 تقرير تنفيذي بـ 3 صيغ (HTML/PDF/Excel)
+3️⃣ Expected results (15-30 minutes)
+   ├── 📊 100+ fintech companies with comprehensive analysis
+   ├── 👥 300+ decision makers with contact information
+   ├── 💰 Market size and opportunity analysis
+   ├── 🔍 Competition map and gaps
+   └── 📈 Executive report in 3 formats (HTML/PDF/Excel)
 
-🎯 القيمة المضافة:
-• توفير 40+ ساعة بحث يدوي
-• دقة 95%+ في تصنيف الشركات
-• تحديث تلقائي للمعلومات
-• رؤى تجارية قابلة للتنفيذ فوراً
-```
-
-#### 🎯 سيناريو 2: التوظيف الذكي (Smart Recruitment)
-```
-🎯 المهمة: "البحث عن مهندسي DevOps متقدمين في السعودية"
-
-📋 استراتيجية البحث الذكية:
-1️⃣ تحليل المتطلبات بالـ AI
-   ├── المهارات الأساسية: Docker, Kubernetes, AWS, Jenkins
-   ├── المهارات الثانوية: Terraform, Ansible, Python
-   ├── مستوى الخبرة: 3-8 سنوات
-   └── المؤشرات: "looking for work", "open to opportunities"
-
-2️⃣ البحث متعدد المصادر
-   ├── 💼 LinkedIn: ملفات مهندسي DevOps + تحليل المهارات
-   ├── 💻 GitHub: تحليل المشاريع والمساهمات
-   ├── 🌐 Stack Overflow: نشاط تقني ومستوى الخبرة
-   ├── 📝 Indeed/Bayt: السير الذاتية النشطة
-   └── 🏢 Company websites: موظفين حاليين للـ passive recruitment
-
-3️⃣ التحليل الذكي للمرشحين
-   ├── 🔍 تقييم المهارات التقنية (1-10)
-   ├── 📊 مؤشر التوفر للعمل (Active/Passive/Not Available)
-   ├── 💰 تحليل توقعات الراتب
-   ├── 📍 تحليل جغرافي (المدينة، استعداد للانتقال)
-   └── 🎯 درجة التطابق مع المتطلبات (%)
-
-🎯 النتائج الذكية:
-• 80+ مرشح مؤهل مع تحليل شامل
-• ترتيب حسب مدى التطابق والتوفر
-• معلومات اتصال محققة ومحدثة
-• رؤى عن سوق المواهب والمنافسة
+🎯 Added value:
+• Save 40+ hours of manual research
+• 95%+ accuracy in company classification
+• Automatic information updates
+• Immediately actionable business insights
 ```
 
-#### 📊 سيناريو 3: استخبارات السوق (Market Intelligence)
+#### 🎯 Scenario 2: Smart Recruitment
 ```
-🎯 المهمة: "تحليل سوق المطاعم السريعة في الرياض للاستثمار"
+🎯 Mission: "Search for advanced DevOps engineers in Saudi Arabia"
 
-📋 التحليل الشامل:
-1️⃣ مسح السوق الكامل
-   ├── 🗺️ Google Maps: جميع مطاعم الوجبات السريعة
-   ├── 📱 Delivery Apps: أداء المطاعم على التطبيقات
-   ├── 📊 Review Analysis: تحليل آراء العملاء بالـ AI
-   ├── 📈 Social Media: مؤشرات الشعبية والنشاط
-   └── 📰 News Analysis: أخبار الصناعة والاتجاهات
+📋 Intelligent search strategy:
+1️⃣ AI requirements analysis
+   ├── Core skills: Docker, Kubernetes, AWS, Jenkins
+   ├── Secondary skills: Terraform, Ansible, Python
+   ├── Experience level: 3-8 years
+   └── Indicators: "looking for work", "open to opportunities"
 
-2️⃣ تحليل المنافسة المتقدم
-   ├── 🏆 تحديد اللاعبين الرئيسيين
-   ├── 💰 تحليل نماذج التسعير
-   ├── 📍 تحليل التوزيع الجغرافي
-   ├── 🎯 تحديد الفجوات السوقية
-   └── 📊 مقارنة الأداء والشعبية
+2️⃣ Multi-source search
+   ├── 💼 LinkedIn: DevOps engineer profiles + skill analysis
+   ├── 💻 GitHub: project analysis and contributions
+   ├── 🌐 Stack Overflow: technical activity and expertise level
+   ├── 📝 Indeed/Bayt: active resumes
+   └── 🏢 Company websites: current employees for passive recruitment
 
-3️⃣ رؤى الاستثمار
-   ├── 🎯 أفضل المناطق للتوسع
-   ├── 💡 الفرص غير المستغلة
-   ├── ⚠️ تحليل المخاطر والتحديات
-   ├── 📈 توقعات نمو السوق
-   └── 🎪 نماذج أعمال ناجحة للمحاكاة
+3️⃣ Intelligent candidate analysis
+   ├── 🔍 Technical skill assessment (1-10)
+   ├── 📊 Work availability index (Active/Passive/Not Available)
+   ├── 💰 Salary expectation analysis
+   ├── 📍 Geographic analysis (city, willingness to relocate)
+   └── 🎯 Requirements match score (%)
 
-🎯 التقرير الاستثماري:
-• خريطة تفاعلية لفرص الاستثمار
-• تحليل ROI متوقع لكل منطقة
-• استراتيجيات دخول السوق
-• قائمة بأفضل 20 موقع للاستثمار
+🎯 Intelligent results:
+• 80+ qualified candidates with comprehensive analysis
+• Ranking by match and availability
+• Verified and updated contact information
+• Talent market and competition insights
 ```
 
-### 🛠️ إعدادات التخصيص المتقدمة
+#### 📊 Scenario 3: Market Intelligence
+```
+🎯 Mission: "Fast food restaurant market analysis in Riyadh for investment"
 
-#### 🧠 تحسين نماذج AI للأداء
+📋 Comprehensive analysis:
+1️⃣ Complete market scan
+   ├── 🗺️ Google Maps: all fast food restaurants
+   ├── 📱 Delivery Apps: restaurant performance on apps
+   ├── 📊 Review Analysis: AI customer opinion analysis
+   ├── 📈 Social Media: popularity and activity indicators
+   └── 📰 News Analysis: industry news and trends
+
+2️⃣ Advanced competition analysis
+   ├── 🏆 Identify key players
+   ├── 💰 Pricing model analysis
+   ├── 📍 Geographic distribution analysis
+   ├── 🎯 Market gap identification
+   └── 📊 Performance and popularity comparison
+
+3️⃣ Investment insights
+   ├── 🎯 Best areas for expansion
+   ├── 💡 Untapped opportunities
+   ├── ⚠️ Risk and challenge analysis
+   ├── 📈 Market growth projections
+   └── 🎪 Successful business models to emulate
+
+🎯 Investment report:
+• Interactive map of investment opportunities
+• Expected ROI analysis for each area
+• Market entry strategies
+• List of top 20 investment locations
+```
+
+### 🛠️ Advanced Customization Settings
+
+#### 🧠 AI Model Performance Optimization
 ```json
 // config/ai_optimization.json
 {
@@ -750,10 +746,10 @@ Q4 2025:
   "models": {
     "text_analysis": {
       "model_size": "mini",  // mini/small/base/large
-      "batch_size": 8,       // يُعدل حسب الـ RAM المتاح
-      "max_length": 256,     // لتوفير الذاكرة
-      "quantization": "int8", // تقليل استهلاك الذاكرة بـ 50%
-      "cache_size": "100MB"   // حجم التخزين المؤقت
+      "batch_size": 8,       // adjust based on available RAM
+      "max_length": 256,     // to save memory
+      "quantization": "int8", // reduce memory usage by 50%
+      "cache_size": "100MB"   // cache size
     },
     "classification": {
       "confidence_threshold": 0.7,
@@ -765,291 +761,319 @@ Q4 2025:
     "max_concurrent_models": 2,
     "memory_limit": "2GB",
     "cpu_threads": 4,
-    "enable_gpu": false  // للاعدادت المحدودة
+    "enable_gpu": false  // for limited setups
   }
 }
 ```
-💼 البحث عن المدراء التنفيذيين
-🎯 المثال: "المدراء التنفيذيين في شركات المقاولات بالرياض"
 
-🤖 استراتيجية النظام:
-├── البحث المباشر: LinkedIn + Google + مواقع الشركات
-├── التوسع بالعلاقات: من كل مدير → زملاء → شركاء → منافسين
-├── التحليل العميق: مناصب + تاريخ العمل + الانتقالات
-└── الشبكة المهنية: من يعرف من؟ وأين يعمل الآن؟
+💼 Executive Search
+🎯 Example: "CEOs in construction companies in Riyadh"
 
-📊 النتائج المتوقعة:
-- 200+ مدير تنفيذي مع معلومات كاملة
-- خريطة العلاقات بين الشركات والأشخاص
-- مسارات التواصل والوصول لكل شخص
-- تحليل انتقالات الموظفين والاتجاهات
-👥 استكشاف الشبكات المهنية المكثف
-🎯 المثال: "أكبر عدد من موظفي التقنية في الرياض"
+🤖 System strategy:
+├── Direct search: LinkedIn + Google + company websites
+├── Relationship expansion: from each CEO → colleagues → partners → competitors
+├── Deep analysis: positions + work history + transitions
+└── Professional network: who knows whom? and where do they work now?
 
-🤖 منهجية الشبكات:
-├── النواة الأولى: 50 موظف تقنية → تحليل شركاتهم
-├── التوسع الأول: 50 شركة → جميع موظفي التقنية بها
-├── التوسع الثاني: شركاء وعملاء هذه الشركات
-├── التوسع الثالث: الموظفين السابقين والمنتقلين
-└── الشبكة الكاملة: 1000+ موظف مع تحليل الروابط
+📊 Expected results:
+- 200+ CEOs with complete information
+- Relationship map between companies and people
+- Communication pathways and access to each person
+- Employee transition analysis and trends
 
-🎯 تحليل العلاقات:
-- من يعمل مع من؟
-- من انتقل من أين إلى أين؟
-- ما هي الشركات الأكثر جذباً للمواهب؟
-- أين تتركز الخبرات التقنية؟
-🔗 تحليل المسارات المهنية والانتقالات
-🎯 المثال: "مسارات الترقي في قطاع البناء والمقاولات"
+👥 Intensive Professional Network Exploration
+🎯 Example: "Largest number of tech employees in Riyadh"
 
-🤖 تحليل المسارات:
-├── تتبع الموظفين: من منصب مبتدئ → مدير → مدير تنفيذي
-├── أنماط الحركة: أي الشركات تستقطب من أين؟
-├── الشركات الحاضنة: التي تخرج المدراء التنفيذيين
-├── نقاط التقاطع: الأشخاص المؤثرين في عدة شركات
-└── الفرص المخفية: من على وشك الانتقال؟
+🤖 Network methodology:
+├── Core first: 50 tech employees → analyze their companies
+├── First expansion: 50 companies → all tech employees in them
+├── Second expansion: partners and clients of these companies
+├── Third expansion: former employees and those who moved
+└── Complete network: 1000+ employees with link analysis
 
-📈 الرؤى الاستراتيجية:
-- خريطة تدفق المواهب بين الشركات
-- الشركات الأكثر تأثيراً في تطوير الكوادر
-- أفضل نقاط الدخول للوصول لشبكة معينة
-- توقع الحركات والانتقالات القادمة
+🎯 Relationship analysis:
+- Who works with whom?
+- Who moved from where to where?
+- Which companies are most attractive to talent?
+- Where are technical expertise concentrated?
 
-🧠 المحرك الذكي للبحث عن الأشخاص
-🔍 تقنيات الاستكشاف المتطورة
-pythonمحرك البحث متعدد المستويات:
-├── 🎯 البحث المباشر
+🔗 Career Path and Transition Analysis
+🎯 Example: "Promotion paths in construction and contracting sector"
+
+🤖 Path analysis:
+├── Employee tracking: from entry-level position → manager → CEO
+├── Movement patterns: which companies recruit from where?
+├── Incubator companies: those that produce CEOs
+├── Intersection points: influential people in multiple companies
+└── Hidden opportunities: who is about to move?
+
+📈 Strategic insights:
+- Talent flow map between companies
+- Most influential companies in developing personnel
+- Best entry points to reach a specific network
+- Predict upcoming movements and transitions
+
+🧠 Intelligent Person Search Engine
+🔍 Advanced Exploration Techniques
+```python
+Multi-level search engine:
+├── 🎯 Direct Search
 │   ├── LinkedIn advanced search
-│   ├── Google dorking للأشخاص
-│   ├── مواقع الشركات وصفحات الفريق
-│   └── منصات التوظيف المهنية
-├── 🕸️ التوسع بالعلاقات
-│   ├── من كل شخص → شبكة زملائه
-│   ├── من كل شركة → جميع موظفيها
-│   ├── من كل منصب → الأشخاص المشابهين
-│   └── من كل مشروع → الفريق المشارك
-├── 🔄 الاستكشاف التكراري
-│   ├── استخدام كل نتيجة كنقطة انطلاق جديدة
-│   ├── تحليل التداخلات والقواسم المشتركة
-│   ├── استكشاف الشبكات المخفية
-│   └── البحث في الطبقات العميقة
-└── 🎪 التحليل الذكي للأنماط
-    ├── من يعمل مع من؟
-    ├── أين يتجمع الخبراء؟
-    ├── ما هي مسارات التطور الوظيفي؟
-    └── كيف تتشكل الشبكات المهنية؟
-📊 تحليل الشبكات والعلاقات
-pythonمحلل الشبكات المهنية:
-├── 🕸️ رسم الخرائط
-│   ├── شبكة العلاقات بين الأشخاص
-│   ├── روابط الشركات والمشاريع
-│   ├── تحليل المراكز المؤثرة
-│   └── اكتشاف المجتمعات المهنية
-├── 📈 تحليل التدفقات
-│   ├── حركة الموظفين بين الشركات
-│   ├── مسارات التطور الوظيفي
-│   ├── أنماط التوظيف والاستقطاب
-│   └── دورات النمو والتطوير
-├── 🎯 تحديد الأهداف الاستراتيجية
-│   ├── الأشخاص الأكثر تأثيراً في الشبكة
-│   ├── النقاط الحرجة للوصول
-│   ├── الجسور بين المجتمعات المختلفة
-│   └── الفرص الذهبية للتوسع
-└── 🔮 التنبؤ والتوقعات
-    ├── من قد ينتقل قريباً؟
-    ├── أين ستكون الفرص الجديدة؟
-    ├── ما هي الاتجاهات الناشئة؟
-    └── كيف ستتطور الشبكة مستقبلاً؟
+│   ├── Google dorking for people
+│   ├── Company websites and team pages
+│   └── Professional recruitment platforms
+├── 🕸️ Relationship Expansion
+│   ├── From each person → their colleague network
+│   ├── From each company → all its employees
+│   ├── From each position → similar people
+│   └── From each project → participating team
+├── 🔄 Iterative Exploration
+│   ├── Using each result as new starting point
+│   ├── Analyzing overlaps and commonalities
+│   ├── Exploring hidden networks
+│   └── Searching in deep layers
+└── 🎪 Intelligent Pattern Analysis
+    ├── Who works with whom?
+    ├── Where do experts gather?
+    ├── What are career development paths?
+    └── How do professional networks form?
+```
 
-🚀 أمثلة تطبيقية شاملة
-🏗️ مثال 1: "مدراء التقنية في قطاع البناء الذكي"
-python# الاستعلام
-target = "مدراء التقنية في شركات البناء الذكي في الرياض"
+📊 Network and Relationship Analysis
+```python
+Professional Network Analyzer:
+├── 🕸️ Mapping
+│   ├── Relationship network between people
+│   ├── Company and project links
+│   ├── Influential center analysis
+│   └── Professional community discovery
+├── 📈 Flow Analysis
+│   ├── Employee
+movement between companies
+│   ├── Career development paths
+│   ├── Recruitment and attraction patterns
+│   └── Growth and development cycles
+├── 🎯 Strategic Target Identification
+│   ├── Most influential people in the network
+│   ├── Critical access points
+│   ├── Bridges between different communities
+│   └── Golden opportunities for expansion
+└── 🔮 Predictions and Forecasts
+    ├── Who might move soon?
+    ├── Where will new opportunities be?
+    ├── What are emerging trends?
+    └── How will the network evolve in the future?
+```
 
-# مراحل التنفيذ
-المرحلة_الأولى = "البحث_المباشر"
+🚀 Comprehensive Application Examples
+
+🏗️ Example 1: "Technology managers in smart construction sector"
+```python
+# Query
+target = "Technology managers in smart construction companies in Riyadh"
+
+# Implementation phases
+Phase_One = "Direct_Search"
 ├── LinkedIn: "IT Director" + "Smart Construction" + "Riyadh"
-├── Google: site:linkedin.com "مدير تقنية" "البناء الذكي" الرياض
-├── مواقع الشركات: صفحات "الفريق" و "الإدارة"
-└── النتائج: 25 مدير تقنية في 15 شركة
+├── Google: site:linkedin.com "Technology Manager" "Smart Construction" Riyadh
+├── Company websites: "Team" and "Management" pages
+└── Results: 25 technology managers in 15 companies
 
-المرحلة_الثانية = "التوسع_بالعلاقات"
-├── من كل مدير → شبكة زملائه في LinkedIn
-├── من كل شركة → جميع موظفي التقنية
-├── من كل مشروع → فرق العمل المشاركة
-└── النتائج: 150 متخصص تقنية في 45 شركة
+Phase_Two = "Relationship_Expansion"
+├── From each manager → their LinkedIn colleague network
+├── From each company → all technology employees
+├── From each project → participating work teams
+└── Results: 150 technology specialists in 45 companies
 
-المرحلة_الثالثة = "الاستكشاف_العميق"
-├── تحليل مسارات الانتقالات الوظيفية
-├── رسم خريطة التداخلات بين الشركات
-├── اكتشاف الشبكات المخفية والمجتمعات
-└── النتائج: 400+ متخصص مع تحليل كامل للعلاقات
+Phase_Three = "Deep_Exploration"
+├── Career transition path analysis
+├── Company overlap mapping
+├── Hidden network and community discovery
+└── Results: 400+ specialists with complete relationship analysis
 
-التحليل_النهائي = "الرؤى_الاستراتيجية"
-├── أهم 50 شخص مؤثر في النظام
-├── أفضل نقاط دخول للشبكة
-├── الشركات الأكثر تأثيراً في القطاع
-└── استراتيجيات التوسع والنمو
-🎯 مثال 2: "شبكة المديرين الماليين في الشركات الناشئة"
-python# الهدف المحدد
-target = "CFOs في الشركات الناشئة السعودية والإماراتية"
+Final_Analysis = "Strategic_Insights"
+├── Top 50 influential people in the system
+├── Best network entry points
+├── Most influential companies in the sector
+└── Expansion and growth strategies
+```
 
-# استراتيجية الشبكات المتقدمة
+🎯 Example 2: "Financial managers network in startups"
+```python
+# Specific target
+target = "CFOs in Saudi and UAE startups"
+
+# Advanced network strategy
 strategy = {
-    "المدخل_الأولي": [
-        "البحث في منصات التمويل والاستثمار",
-        "صفحات الشركات الناشئة في LinkedIn",
-        "قوائم المتحدثين في مؤتمرات ريادة الأعمال",
-        "تقارير التمويل ومنصات مثل MAGNiTT"
+    "Initial_Entry": [
+        "Search in funding and investment platforms",
+        "Startup company pages on LinkedIn",
+        "Speaker lists at entrepreneurship conferences", 
+        "Funding reports and platforms like MAGNiTT"
     ],
     
-    "التوسع_الذكي": [
-        "من كل CFO → الشركات التي عمل بها سابقاً",
-        "من كل مستثمر → محفظة الشركات",
-        "من كل حدث → قائمة الحضور والمتحدثين",
-        "من كل شركة → المستشارين الماليين"
+    "Smart_Expansion": [
+        "From each CFO → companies they previously worked at",
+        "From each investor → company portfolio",
+        "From each event → attendee and speaker lists",
+        "From each company → financial advisors"
     ],
     
-    "التحليل_المتقدم": [
-        "من ينتقل بين الشركات الناشئة؟",
-        "ما هي أنماط التمويل والاستقطاب؟",
-        "أين تتركز الخبرات المالية؟",
-        "من هم الأشخاص الجسور بين النظم؟"
+    "Advanced_Analysis": [
+        "Who moves between startups?",
+        "What are funding and recruitment patterns?",
+        "Where is financial expertise concentrated?",
+        "Who are the bridge people between ecosystems?"
     ]
 }
 
-# النتائج المتوقعة
+# Expected results
 results = {
-    "مديرين_ماليين": "200+ CFO مع تحليل مساراتهم",
-    "شبكة_العلاقات": "خريطة تفاعلية للروابط",
-    "رؤى_السوق": "أنماط التوظيف والانتقالات",
-    "فرص_التواصل": "أفضل طرق الوصول لكل مجموعة"
+    "financial_managers": "200+ CFOs with career path analysis",
+    "relationship_network": "Interactive relationship map",
+    "market_insights": "Recruitment and transition patterns",
+    "networking_opportunities": "Best ways to reach each group"
 }
-🔗 مثال 3: "رسم خريطة شبكة المهندسين المعماريين"
-python# البحث التوسعي المكثف
-target = "أكبر شبكة ممكنة من المهندسين المعماريين في المملكة"
+```
 
-# منهجية البحث متعدد المراحل
-phase_1 = "إنشاء_النواة"
-├── البحث في نقابة المهندسين
+🔗 Example 3: "Mapping architect network"
+```python
+# Intensive expansion search
+target = "Largest possible network of architects in the Kingdom"
+
+# Multi-phase search methodology
+phase_1 = "Core_Creation"
+├── Search in Engineers Association
 ├── LinkedIn: "Architect" + "Saudi Arabia"
-├── مكاتب التصميم الكبرى
-├── أساتذة الجامعات والكليات
-└── النتيجة: 100 معمار كنقطة انطلاق
+├── Major design firms
+├── University and college professors
+└── Result: 100 architects as starting point
 
-phase_2 = "التوسع_الأولي"
-├── من كل معمار → شركائه ومعاونيه
-├── من كل مكتب → جميع المهندسين
-├── من كل مشروع → فريق التصميم
-├── من كل جامعة → الخريجين والطلاب
-└── النتيجة: 500 معمار مع تفاصيل المشاريع
+phase_2 = "Initial_Expansion"
+├── From each architect → their partners and assistants
+├── From each firm → all engineers
+├── From each project → design team
+├── From each university → graduates and students
+└── Result: 500 architects with project details
 
-phase_3 = "التوسع_العميق"
-├── تحليل المشاريع المشتركة
-├── رسم خريطة التعاونات
-├── اكتشاف الشبكات الإقليمية
-├── تتبع الخريجين والمنتقلين
-└── النتيجة: 1500+ معمار مع شبكة العلاقات
+phase_3 = "Deep_Expansion"
+├── Joint project analysis
+├── Collaboration mapping
+├── Regional network discovery
+├── Graduate and transfer tracking
+└── Result: 1500+ architects with relationship network
 
-phase_4 = "التحليل_النهائي"
-├── من هم المعماريون الأكثر تأثيراً؟
-├── ما هي أقوى الشبكات المهنية؟
-├── أين تتركز المواهب والخبرات؟
-├── كيف تتفاعل المجتمعات المختلفة؟
-└── استراتيجيات الوصول والتأثير
+phase_4 = "Final_Analysis"
+├── Who are the most influential architects?
+├── What are the strongest professional networks?
+├── Where are talents and expertise concentrated?
+├── How do different communities interact?
+└── Access and influence strategies
+```
 
-🛠️ أدوات التحليل المتخصصة
-📊 محلل الشبكات المرئي
-pythonNetwork Analysis Dashboard:
-├── 🕸️ خريطة العلاقات التفاعلية
-│   ├── عقد (Nodes): الأشخاص والشركات
-│   ├── روابط (Edges): أنواع العلاقات المختلفة
-│   ├── أوزان (Weights): قوة العلاقة وتكرار التفاعل
-│   └── مجتمعات (Communities): المجموعات المترابطة
-├── 📈 تحليل المقاييس
-│   ├── Centrality: الأشخاص الأكثر تأثيراً
-│   ├── Betweenness: الجسور بين المجتمعات
-│   ├── Clustering: كثافة الروابط المحلية
-│   └── Path Length: أقصر طرق الوصول
-├── 🔍 أدوات البحث المتقدمة
-│   ├── البحث بالمسارات: كيف تصل من A إلى B؟
-│   ├── تحليل التأثير: من يؤثر على من؟
-│   ├── اكتشاف المجتمعات: المجموعات المخفية
-│   └── تنبؤ الروابط: العلاقات المحتملة
-└── 📋 تقارير متخصصة
-    ├── تقرير كل شخص: شبكته ومجال تأثيره
-    ├── تقرير كل شركة: موظفيها وروابطها
-    ├── تقرير كل قطاع: اللاعبين والتفاعلات
-    └── تقرير استراتيجي: أفضل نقاط الدخول
-🎯 محرك التوصيات الذكية
-pythonSmart Recommendations Engine:
-├── 🔍 استراتيجيات البحث
-│   ├── "ابحث عن زملاء X السابقين في شركة Y"
-│   ├── "استكشف المنافسين المباشرين لشركة Z"
-│   ├── "ابحث عن الأشخاص المنتقلين حديثاً"
-│   └── "استكشف شبكة الموردين والشركاء"
-├── 🎯 نقاط الدخول المثلى
-│   ├── الأشخاص الأكثر تأثيراً في الشبكة
-│   ├── الجسور بين المجتمعات المختلفة
-│   ├── النقاط الحرجة للوصول
-│   └── الشخصيات المحورية في كل قطاع
-├── 📈 فرص التوسع
-│   ├── المجالات غير المستكشفة
-│   ├── الشبكات الناشئة والمتنامية
-│   ├── نقاط التقاطع بين القطاعات
-│   └── الفرص المخفية في البيانات
-└── ⚡ التحسين المستمر
-    ├── تعلم من نتائج البحثات السابقة
-    ├── تحديث استراتيجيات البحث
-    ├── تحسين خوارزميات التوسع
-    └── تطوير أنماط جديدة للاستكشاف
+🛠️ Specialized Analysis Tools
 
-📋 التقارير المتخصصة للأشخاص والعلاقات
-📊 تقرير الشبكة الشخصية
-لكل شخص مُكتشف:
-├── 👤 المعلومات الأساسية
-│   ├── الاسم والمنصب الحالي
-│   ├── الشركة ومدة العمل
-│   ├── التاريخ المهني والانتقالات
-│   └── المؤهلات والشهادات
-├── 🕸️ شبكة العلاقات
-│   ├── الزملاء المباشرين
-│   ├── الشركاء في المشاريع
-│   ├── الرؤساء والمرؤوسين
-│   └── الشبكة الخارجية
-├── 🎯 التأثير والأهمية
-│   ├── مؤشر التأثير في الشبكة
-│   ├── الدور كجسر بين المجتمعات
-│   ├── مستوى النشاط والتفاعل
-│   └── القدرة على الوصول للآخرين
-└── 📈 الرؤى الاستراتيجية
-    ├── أفضل طرق التواصل
-    ├── نقاط الاهتمام المشتركة
-    ├── فرص التعاون المحتملة
-    └── القيمة المضافة المتوقعة
-🏢 تقرير الشبكة المؤسسية
-لكل شركة مُكتشفة:
-├── 🏗️ الهيكل التنظيمي
-│   ├── الإدارة العليا والقيادات
-│   ├── رؤساء الأقسام والمدراء
-│   ├── المتخصصين والخبراء
-│   └── الموظفين الجدد والمنتقلين
-├── 🔗 الشبكة الخارجية
-│   ├── الشركاء والموردين
-│   ├── العملاء الرئيسيين
-│   ├── المنافسين والمتعاونين
-│   └── الشبكة الاستشارية
-├── 📊 تحليل الحراك
-│   ├── معدل دوران الموظفين
-│   ├── أنماط التوظيف والاستقطاب
-│   ├── مصادر المواهب الرئيسية
-│   └── وجهات الموظفين المنتقلين
-└── 🎯 الفرص والرؤى
-    ├── نقاط القوة في الشبكة
-    ├── الثغرات والفرص
-    ├── استراتيجيات الوصول
-    └── توقعات التطور والنمو
-    
-#### 🔍 تخصيص محركات البحث
+📊 Visual Network Analyzer
+```python
+Network Analysis Dashboard:
+├── 🕸️ Interactive Relationship Map
+│   ├── Nodes: People and companies
+│   ├── Edges: Different relationship types
+│   ├── Weights: Relationship strength and interaction frequency
+│   └── Communities: Interconnected groups
+├── 📈 Metrics Analysis
+│   ├── Centrality: Most influential people
+│   ├── Betweenness: Bridges between communities
+│   ├── Clustering: Local connection density
+│   └── Path Length: Shortest access routes
+├── 🔍 Advanced Search Tools
+│   ├── Path search: How to get from A to B?
+│   ├── Influence analysis: Who influences whom?
+│   ├── Community discovery: Hidden groups
+│   └── Link prediction: Potential relationships
+└── 📋 Specialized Reports
+    ├── Person report: Their network and sphere of influence
+    ├── Company report: Its employees and connections
+    ├── Sector report: Players and interactions
+    └── Strategic report: Best entry points
+```
+
+🎯 Intelligent Recommendation Engine
+```python
+Smart Recommendations Engine:
+├── 🔍 Search Strategies
+│   ├── "Find former colleagues of X at company Y"
+│   ├── "Explore direct competitors of company Z"
+│   ├── "Search for recently moved people"
+│   └── "Explore supplier and partner network"
+├── 🎯 Optimal Entry Points
+│   ├── Most influential people in the network
+│   ├── Bridges between different communities
+│   ├── Critical access points
+│   └── Pivotal figures in each sector
+├── 📈 Expansion Opportunities
+│   ├── Unexplored areas
+│   ├── Emerging and growing networks
+│   ├── Cross-sector intersection points
+│   └── Hidden opportunities in data
+└── ⚡ Continuous Optimization
+    ├── Learn from previous search results
+    ├── Update search strategies
+    ├── Improve expansion algorithms
+    └── Develop new exploration patterns
+```
+
+📋 Specialized Reports for People and Relationships
+
+📊 Personal Network Report
+For each discovered person:
+├── 👤 Basic Information
+│   ├── Name and current position
+│   ├── Company and tenure
+│   ├── Career history and transitions
+│   └── Qualifications and certifications
+├── 🕸️ Relationship Network
+│   ├── Direct colleagues
+│   ├── Project partners
+│   ├── Superiors and subordinates
+│   └── External network
+├── 🎯 Influence and Importance
+│   ├── Network influence index
+│   ├── Role as bridge between communities
+│   ├── Activity and interaction level
+│   └── Ability to reach others
+└── 📈 Strategic Insights
+    ├── Best communication methods
+    ├── Common interest points
+    ├── Potential collaboration opportunities
+    └── Expected added value
+```
+
+🏢 Institutional Network Report
+For each discovered company:
+├── 🏗️ Organizational Structure
+│   ├── Senior management and leadership
+│   ├── Department heads and managers
+│   ├── Specialists and experts
+│   └── New and transferred employees
+├── 🔗 External Network
+│   ├── Partners and suppliers
+│   ├── Key clients
+│   ├── Competitors and collaborators
+│   └── Advisory network
+├── 📊 Movement Analysis
+│   ├── Employee turnover rate
+│   ├── Recruitment and attraction patterns
+│   ├── Main talent sources
+│   └── Destinations of departing employees
+└── 🎯 Opportunities and Insights
+    ├── Network strengths
+    ├── Gaps and opportunities
+    ├── Access strategies
+    └── Development and growth predictions
+```
+
+#### 🔍 Search Engine Customization
 ```json
 // config/search_optimization.json
 {
@@ -1071,8 +1095,8 @@ pythonSmart Recommendations Engine:
       "business_focus": true
     },
     "specialized_tools": {
-      "venarx": { "enabled": false },  // يحتاج اشتراك
-      "social_links": { "enabled": false }, // يحتاج API key
+      "venarx": { "enabled": false },  // requires subscription
+      "social_links": { "enabled": false }, // requires API key
       "osint_industries": { "enabled": false }
     }
   },
@@ -1085,18 +1109,18 @@ pythonSmart Recommendations Engine:
 }
 ```
 
-#### 🗄️ إعدادات قاعدة البيانات
+#### 🗄️ Database Settings
 ```json
 // config/database_config.json
 {
   "primary_db": "sqlite_enhanced",
   "advanced_features": {
     "neo4j": {
-      "enabled": false,  // للاجهزة المحدودة
+      "enabled": false,  // for limited devices
       "memory_limit": "512MB"
     },
     "elasticsearch": {
-      "enabled": false,  // للاجهزة المحدودة
+      "enabled": false,  // for limited devices
       "heap_size": "256MB"
     }
   },
@@ -1116,11 +1140,11 @@ pythonSmart Recommendations Engine:
 
 ---
 
-## 🔄 إدارة النظام والصيانة
+## 🔄 System Management and Maintenance
 
-### 📊 مراقبة الأداء والتحسين
+### 📊 Performance Monitoring and Optimization
 ```python
-# مراقبة استهلاك الموارد
+# Resource usage monitoring
 Performance Monitoring:
 ├── 💾 Memory Usage
 │   ├── AI Models: Real-time RAM usage
@@ -1144,9 +1168,9 @@ Performance Monitoring:
     └── Source Diversity: Multi-source validation
 ```
 
-### 🔧 صيانة النظام التلقائية
+### 🔧 Automatic System Maintenance
 ```python
-# مهام الصيانة المجدولة
+# Scheduled maintenance tasks
 Automated Maintenance:
 ├── 🗂️ Database Cleanup
 │   ├── Old cache removal (weekly)
@@ -1172,110 +1196,107 @@ Automated Maintenance:
 
 ---
 
-## 🤝 المساهمة والدعم
+## 🤝 Contributing and Support
 
-### 🛠️ كيفية المساهمة
+### 🛠️ How to Contribute
 ```
-طرق المساهمة في المشروع:
-├── 🔍 تطوير مصادر OSINT جديدة
-├── 🧠 تحسين نماذج AI المحلية
-├── 🌐 إضافة دعم لغات جديدة
-├── 🔒 تعزيز ميزات الأمان
-├── 📊 تطوير تقارير متقدمة
-├── 🐛 الإبلاغ عن الأخطاء وإصلاحها
-└── 📖 تحسين التوثيق والأدلة
+Ways to contribute to the project:
+├── 🔍 Develop new OSINT sources
+├── 🧠 Improve local AI models
+├── 🌐 Add support for new languages
+├── 🔒 Enhance security features
+├── 📊 Develop advanced reports
+├── 🐛 Report bugs and fix them
+└── 📖 Improve documentation and guides
 ```
 
-### 📞 الدعم التقني
+### 📞 Technical Support
 ```
-قنوات الدعم المتاحة:
+Available support channels:
 ├── 📧 Email: support@advanced-osint.com
-├── 💬 GitHub Issues: للمشاكل التقنية
-├── 📚 Documentation: دليل شامل متاح
-├── 🎥 Video Tutorials: شروحات مرئية
-├── 👥 Community Forum: منتدى المجتمع
-└── 📱 Discord Server: دعم فوري
+├── 💬 GitHub Issues: for technical problems
+├── 📚 Documentation: comprehensive guide available
+├── 🎥 Video Tutorials: visual explanations
+├── 👥 Community Forum: community forum
+└── 📱 Discord Server: instant support
 ```
 
-### 🏆 الاعتمادات والشكر
+### 🏆 Credits and Acknowledgments
 ```
-شكر خاص للمشاريع والأدوات المستخدمة:
-├── 🧠 Hugging Face: نماذج AI المحلية
-├── 🕸️ Neo4j: قاعدة البيانات البيانية
-├── 🔍 Elasticsearch: محرك البحث المتقدم
-├── 🐍 Python Community: المكتبات المتميزة
-├── 🌐 OSINT Community: الأدوات والتقنيات
-└── 🔒 Security Researchers: تقنيات الحماية
+Special thanks to the projects and tools used:
+├── 🧠 Hugging Face: Local AI models
+├── 🕸️ Neo4j: Graph database
+├── 🔍 Elasticsearch: Advanced search engine
+├── 🐍 Python Community: Excellent libraries
+├── 🌐 OSINT Community: Tools and techniques
+└── 🔒 Security Researchers: Protection techniques
 ```
 
 ---
 
-## 📜 الترخيص والاستخدام القانوني
+## 📜 License and Legal Usage
 
-### ⚖️ شروط الاستخدام
+### ⚖️ Terms of Use
 ```
 IMPORTANT LEGAL NOTICE:
-├── ✅ الاستخدام المسموح:
-│   ├── البحث الأكاديمي والتعليمي
-│   ├── التحقيقات الأمنية المشروعة
-│   ├── أبحاث السوق التجارية
-│   ├── التحقق من المعلومات العامة
-│   └── حماية الأمن السيبراني
-├── ❌ الاستخدام المحظور:
-│   ├── التجسس غير المشروع
-│   ├── انتهاك الخصوصية الشخصية
-│   ├── الاستخدام للأغراض الإجرامية
-│   ├── التلاعب أو التضليل
-│   └── انتهاك القوانين المحلية
-└── 🔒 إخلاء المسؤولية:
-    ├── المستخدم مسؤول عن الاستخدام القانوني
-    ├── احترام قوانين الخصوصية المحلية
-    ├── عدم انتهاك حقوق الملكية الفكرية
-    └── الالتزام بشروط الخدمة للمصادر المختلفة
+├── ✅ Permitted Use:
+│   ├── Academic and educational research
+│   ├── Legitimate security investigations
+│   ├── Commercial market research
+│   ├── Public information verification
+│   └── Cybersecurity protection
+├── ❌ Prohibited Use:
+│   ├── Illegal espionage
+│   ├── Personal privacy violation
+│   ├── Criminal purposes
+│   ├── Manipulation or deception
+│   └── Local law violations
+└── 🔒 Disclaimer:
+    ├── User responsible for legal usage
+    ├── Respect local privacy laws
+    ├── Do not violate intellectual property rights
+    └── Comply with various source terms of service
 ```
 
-### 📋 ترخيص MIT
+### 📋 MIT License
 ```
-MIT License - الاستخدام الحر مع شروط:
-├── ✅ الاستخدام التجاري مسموح
-├── ✅ التعديل والتطوير مسموح  
-├── ✅ التوزيع مسموح
-├── ✅ الاستخدام الخاص مسموح
-├── ❗ يجب الاحتفاظ بإشعار الحقوق
-└── ❗ لا ضمانات مقدمة - استخدم على مسؤوليتك
+MIT License - Free use with conditions:
+├── ✅ Commercial use permitted
+├── ✅ Modification and development permitted
+├── ✅ Distribution permitted
+├── ✅ Private use permitted
+├── ❗ Must retain copyright notice
+└── ❗ No warranties provided - use at your own risk
 ```
 
 ---
 
-## 🚀 خاتمة: مستقبل الاستخبارات الذكية
+## 🚀 Conclusion: The Future of Intelligent Intelligence
 
-### 🌟 الرؤية طويلة المدى
-Advanced OSINT Intelligence System v2.0 ليس مجرد أداة، بل **نقلة نوعية** في مجال الاستخبارات مفتوحة المصدر. بدمج أحدث تقنيات الذكاء الاصطناعي المحلي مع قوة الإنترنت الفائق، نحن نعيد تعريف ما هو ممكن في عالم جمع وتحليل المعلومات.
+### 🌟 Long-term Vision
+Advanced OSINT Intelligence System v2.0 is not just a tool, but a **paradigm shift** in the field of open source intelligence. By combining the latest local artificial intelligence technologies with the power of the super internet, we are redefining what is possible in the world of information gathering and analysis.
 
-### 🎯 القيمة الحقيقية للمستخدمين
+### 🎯 Real Value for Users
 ```
-📈 عوائد مثبتة:
-├── ⏱️ توفير 80% من وقت البحث اليدوي
-├── 🎯 زيادة دقة النتائج بنسبة 300%+
-├── 💰 تقليل تكاليف الأبحاث بنسبة 70%
-├── 🔍 اكتشاف فرص مخفية بكفاءة 95%+
-└── 📊 رؤى قابلة للتنفيذ فورياً
+📈 Proven returns:
+├── ⏱️ Save 80% of manual search time
+├── 🎯 Increase result accuracy by 300%+
+├── 💰 Reduce research costs by 70%
+├── 🔍 Discover hidden opportunities with 95%+ efficiency
+└── 📊 Immediately actionable insights
 ```
 
-### 🔮 التطلع للمستقبل
-مع نمو سوق OSINT من **8 مليار دولار إلى 43.7 مليار دولار** في العقد القادم، نحن نضع الأسس لنظام يتطور مع هذا النمو. كل تحديث، كل ميزة جديدة، وكل تحسين يقربنا أكثر من هدفنا: **جعل المعلومات الاستخباراتية في متناول الجميع، بأمان ودقة وكفاءة لا مثيل لها**.
+### 🔮 Looking to the Future
+With the OSINT market growing from **$8 billion to $43.7 billion** in the next decade, we are laying the foundation for a system that evolves with this growth. Every update, every new feature, and every improvement brings us closer to our goal: **making intelligence information accessible to everyone, with unmatched security, accuracy, and efficiency**.
 
 ---
 
 <div align="center">
 
-### 🎉 ابدأ رحلتك في عالم الاستخبارات الذكية اليوم!
+### 🎉 Start your journey in the world of intelligent intelligence today!
 
-[![Download](https://img.shields.io/badge/Download-Advanced%20OSINT%20v2.0-blue?style=for-the-badge&logo=download)](https://github.com/your-repo/AdvancedOSINT-v2.0/releases)
-[![Documentation](https://img.shields.io/badge/Read-Documentation-green?style=for-the-badge&logo=book)](https://docs.advanced-osint.com)
-[![Community](https://img.shields.io/badge/Join-Community-purple?style=for-the-badge&logo=discord)](https://discord.gg/advanced-osint)
 
-**🔥 نسخة محدودة مع جميع الميزات المتقدمة - مجاناً للاستخدام الشخصي والأكاديمي**
+**🔥 Limited edition with all advanced features - free for personal and academic use**
 
 </div>
 
@@ -1284,10 +1305,10 @@ Advanced OSINT Intelligence System v2.0 ليس مجرد أداة، بل **نقل
 <div align="center">
 <small>
 
-**Advanced OSINT Intelligence System v2.0** - صُمم بشغف للمحققين والباحثين ومحللي الأعمال  
+**Advanced OSINT Intelligence System v2.0** - Designed with passion for investigators, researchers, and business analysts  
 Built with ❤️ for the OSINT Community | Made in Saudi Arabia 🇸🇦
 
-*"المعلومات قوة، والذكاء الاصطناعي يضاعف هذه القوة"*
+*"Information is power, and artificial intelligence multiplies this power"*
 
 </small>
 </div>
