@@ -15,14 +15,12 @@ from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 
-from ..collectors.business_directories import BusinessDirectoryCollector
-from ..collectors.job_portals import JobPortalsCollector
-from ..collectors.specialized_tools import SpecializedToolsCollector
-from ..utils.rate_limiter import RateLimiter
-
-# Import collectors (will be implemented)
+# Import collectors
 from collectors.search_engines import IntelligentSearchCollector
 from collectors.social_media import SocialMediaIntelligenceCollector
+from collectors.business_directories import BusinessDirectoryCollector
+from collectors.specialized_tools import SpecializedToolsCollector
+from utils.rate_limiter import RateLimiter
 
 logger = logging.getLogger(__name__)
 
@@ -43,13 +41,6 @@ class IntelligenceScope(Enum):
     NATIONAL = "national"  # Country level
     REGIONAL = "regional"  # Multi-country region
     GLOBAL = "global"  # Worldwide scope
-
-class DataPriority(Enum):
-    """Priority levels for different data types"""
-    CRITICAL = "critical"  # Contact info, key personnel
-    HIGH = "high"  # Business details, roles
-    MEDIUM = "medium"  # Background info, context
-    LOW = "low"  # Additional context, nice-to-have
 
 @dataclass
 class DiscoveryTarget:
@@ -103,50 +94,18 @@ class AdvancedDiscoveryEngine:
     """
     
     def __init__(self):
-        self.business_collector = BusinessDirectoryCollector()
-        self.job_collector = JobPortalsCollector()
-        self.tools_collector = SpecializedToolsCollector()
+        # Initialize collectors
+        self.collectors = self._initialize_collectors()
+        
+        # Load configuration
+        self.target_patterns = self._load_target_patterns()
+        self.keyword_generators = self._initialize_keyword_generators()
+        
+        # Active investigations tracking
+        self.active_investigations = {}
+        
+        # Rate limiter for overall coordination
         self.rate_limiter = RateLimiter()
-        
-    async def execute_discovery(self, target: str, params: Dict) -> Dict[str, Any]:
-        """Execute comprehensive discovery"""
-        logger.info(f"Starting discovery for target: {target}")
-        
-        # Initialize results container
-        results = {
-            'business_listings': [],
-            'job_profiles': [],
-            'technical_data': [],
-            'metadata': {
-                'target': target,
-                'timestamp': datetime.now(),
-                'parameters': params
-            }
-        }
-        
-        # Execute parallel collectors
-        tasks = [
-            self.business_collector.comprehensive_directory_search(target, params),
-            self.job_collector.comprehensive_job_portal_search(target, params),
-            self.tools_collector.specialized_intelligence_gathering(target, params)
-        ]
-        
-        collector_results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Process results
-        for idx, result in enumerate(collector_results):
-            if isinstance(result, Exception):
-                logger.error(f"Collector {idx} failed: {result}")
-                continue
-            
-            if idx == 0:
-                results['business_listings'] = result
-            elif idx == 1:
-                results['job_profiles'] = result
-            elif idx == 2:
-                results['technical_data'] = result
-        
-        return results
 
     def _initialize_collectors(self) -> Dict[str, Any]:
         """Initialize all intelligence collectors"""
@@ -154,7 +113,6 @@ class AdvancedDiscoveryEngine:
             'search_engines': IntelligentSearchCollector(),
             'social_media': SocialMediaIntelligenceCollector(), 
             'business_directories': BusinessDirectoryCollector(),
-            'job_portals': JobPortalsCollector(),
             'specialized_tools': SpecializedToolsCollector()
         }
     
@@ -401,7 +359,7 @@ class AdvancedDiscoveryEngine:
         methods.append('search_engines')
         
         if target.target_type in [TargetType.PEOPLE_GROUP, TargetType.PROFESSIONAL_CATEGORY]:
-            methods.extend(['social_media', 'job_portals'])
+            methods.extend(['social_media'])
         
         if target.target_type in [TargetType.BUSINESS_CATEGORY, TargetType.SERVICE_PROVIDERS]:
             methods.extend(['business_directories', 'social_media'])
@@ -424,14 +382,12 @@ class AdvancedDiscoveryEngine:
             'search_engines': 10,
             'social_media': 8,
             'business_directories': 7,
-            'job_portals': 6,
             'specialized_tools': 5
         }
         
         # Adjust based on target type
         if target.target_type in [TargetType.PEOPLE_GROUP, TargetType.PROFESSIONAL_CATEGORY]:
             base_priorities['social_media'] = 10
-            base_priorities['job_portals'] = 9
         
         elif target.target_type in [TargetType.BUSINESS_CATEGORY, TargetType.SERVICE_PROVIDERS]:
             base_priorities['business_directories'] = 10
@@ -440,8 +396,7 @@ class AdvancedDiscoveryEngine:
         # Adjust based on context
         context = questionnaire_data.get('context', '')
         if context == 'recruitment':
-            base_priorities['job_portals'] = 10
-            base_priorities['social_media'] = 9
+            base_priorities['social_media'] = 10
         elif context == 'lead_generation':
             base_priorities['business_directories'] = 10
             base_priorities['search_engines'] = 9
@@ -590,8 +545,6 @@ class AdvancedDiscoveryEngine:
             return await collector.comprehensive_social_discovery(target.primary_identifier, params)
         elif method == 'business_directories':
             return await collector.comprehensive_directory_search(target.primary_identifier, params)
-        elif method == 'job_portals':
-            return await collector.comprehensive_job_portal_search(target.primary_identifier, params)
         elif method == 'specialized_tools':
             return await collector.specialized_intelligence_gathering(target.primary_identifier, params)
         else:
@@ -642,8 +595,11 @@ class AdvancedDiscoveryEngine:
         
         logger.info(f"Post-processing {len(results)} results")
         
+        # Convert different result types to IntelligenceResult format
+        standardized_results = self._standardize_results(results, strategy)
+        
         # Remove duplicates
-        unique_results = self._remove_duplicates(results)
+        unique_results = self._remove_duplicates(standardized_results)
         
         # Calculate relevance scores
         scored_results = self._calculate_relevance_scores(unique_results, strategy)
@@ -662,6 +618,58 @@ class AdvancedDiscoveryEngine:
         limit = limit_map.get(strategy.target.urgency_level, 200)
         
         return sorted_results[:limit]
+
+    def _standardize_results(self, results: List, strategy: DiscoveryStrategy) -> List[IntelligenceResult]:
+        """Convert different result types to standardized format"""
+        standardized = []
+        
+        for result in results:
+            if hasattr(result, 'name'):  # Business listing
+                intel_result = IntelligenceResult(
+                    id=f"result_{len(standardized)}",
+                    investigation_id=0,  # Will be set later
+                    data_type="business_profile",
+                    value=result.name,
+                    confidence=getattr(result, 'confidence_score', 0.5),
+                    source_method=getattr(result, 'source_directory', 'unknown'),
+                    source_url=getattr(result, 'listing_url', ''),
+                    context={
+                        'address': getattr(result, 'address', ''),
+                        'phone': getattr(result, 'phone', ''),
+                        'website': getattr(result, 'website', ''),
+                        'category': getattr(result, 'category', '')
+                    },
+                    timestamp=datetime.now(),
+                    validation_status='pending',
+                    enrichment_data=getattr(result, 'metadata', {}),
+                    geographic_location=strategy.target.geographic_focus,
+                    relevance_score=0.5
+                )
+                standardized.append(intel_result)
+            
+            elif hasattr(result, 'title'):  # Search result
+                intel_result = IntelligenceResult(
+                    id=f"result_{len(standardized)}",
+                    investigation_id=0,
+                    data_type="search_result",
+                    value=result.title,
+                    confidence=getattr(result, 'confidence_score', 0.5),
+                    source_method=getattr(result, 'search_engine', 'search'),
+                    source_url=getattr(result, 'url', ''),
+                    context={
+                        'snippet': getattr(result, 'snippet', ''),
+                        'domain': getattr(result, 'domain', ''),
+                        'keywords': getattr(result, 'keywords_used', [])
+                    },
+                    timestamp=getattr(result, 'timestamp', datetime.now()),
+                    validation_status='pending',
+                    enrichment_data=getattr(result, 'metadata', {}),
+                    geographic_location=strategy.target.geographic_focus,
+                    relevance_score=0.5
+                )
+                standardized.append(intel_result)
+        
+        return standardized
 
     def _remove_duplicates(self, results: List[IntelligenceResult]) -> List[IntelligenceResult]:
         """Remove duplicate results"""
@@ -895,102 +903,6 @@ class AdvancedDiscoveryEngine:
         
         return str(exports_dir / filename)
 
-    def _export_to_html(self, results: List[IntelligenceResult], investigation: Dict) -> str:
-        """Export results to HTML report format"""
-        html_template = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSINT Investigation Report</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
-        .summary { background: #ecf0f1; padding: 15px; margin: 20px 0; border-radius: 5px; }
-        .result { border: 1px solid #bdc3c7; margin: 10px 0; padding: 15px; border-radius: 5px; }
-        .high-confidence { border-left: 5px solid #27ae60; }
-        .medium-confidence { border-left: 5px solid #f39c12; }
-        .low-confidence { border-left: 5px solid #e74c3c; }
-        .meta { color: #7f8c8d; font-size: 0.9em; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Advanced OSINT Investigation Report</h1>
-        <p>Target: {target}</p>
-        <p>Generated: {timestamp}</p>
-    </div>
-    
-    <div class="summary">
-        <h2>Investigation Summary</h2>
-        <p><strong>Total Results:</strong> {total_results}</p>
-        <p><strong>Investigation Duration:</strong> {duration}</p>
-        <p><strong>High Confidence Results:</strong> {high_confidence_count}</p>
-        <p><strong>Data Sources Used:</strong> {sources_used}</p>
-    </div>
-    
-    <div class="results">
-        <h2>Intelligence Results</h2>
-        {results_html}
-    </div>
-</body>
-</html>
-        """
-        
-        # Generate results HTML
-        results_html = ""
-        high_confidence_count = 0
-        sources_used = set()
-        
-        for result in results:
-            if result.confidence >= 0.8:
-                confidence_class = "high-confidence"
-                high_confidence_count += 1
-            elif result.confidence >= 0.5:
-                confidence_class = "medium-confidence"
-            else:
-                confidence_class = "low-confidence"
-            
-            sources_used.add(result.source_method)
-            
-            results_html += f"""
-            <div class="result {confidence_class}">
-                <h3>{result.data_type.replace('_', ' ').title()}</h3>
-                <p><strong>Value:</strong> {result.value}</p>
-                <p><strong>Confidence:</strong> {result.confidence:.2f} | <strong>Relevance:</strong> {result.relevance_score:.2f}</p>
-                <div class="meta">
-                    <p><strong>Source:</strong> {result.source_method} | <strong>URL:</strong> <a href="{result.source_url}" target="_blank">View Source</a></p>
-                    <p><strong>Location:</strong> {result.geographic_location or 'Unknown'} | <strong>Status:</strong> {result.validation_status}</p>
-                </div>
-            </div>
-            """
-        
-        # Calculate duration
-        start_time = investigation['start_time']
-        end_time = investigation.get('end_time', datetime.now())
-        duration = str(end_time - start_time).split('.')[0]  # Remove microseconds
-        
-        # Fill template
-        html_content = html_template.format(
-            target=investigation['strategy'].target.primary_identifier,
-            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            total_results=len(results),
-            duration=duration,
-            high_confidence_count=high_confidence_count,
-            sources_used=', '.join(sources_used),
-            results_html=results_html
-        )
-        
-        filename = f"investigation_report_{investigation['strategy'].target.primary_identifier.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        exports_dir = Path("data/exports")
-        exports_dir.mkdir(exist_ok=True)
-        
-        with open(exports_dir / filename, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-        
-        return str(exports_dir / filename)
-
     def cleanup_old_investigations(self, days: int = 7) -> int:
         """Clean up investigations older than specified days"""
         cutoff_date = datetime.now() - timedelta(days=days)
@@ -1040,6 +952,13 @@ async def test_discovery_engine():
         print(f"Collection Methods: {strategy.collection_methods}")
         print(f"Keywords: {strategy.search_keywords[:5]}...")
         print(f"Expected Results: {strategy.expected_result_types}")
+        
+        # Test quick discovery
+        try:
+            quick_results = await engine.quick_discovery(target, {'context': 'test'})
+            print(f"Quick Discovery: {len(quick_results)} results found")
+        except Exception as e:
+            print(f"Quick Discovery Error: {e}")
 
 if __name__ == "__main__":
     # Run test

@@ -1,57 +1,34 @@
+#!/usr/bin/env python3
 """
-OSINT Data Collectors Package
-============================
-
-This package contains specialized collectors for gathering intelligence from various sources:
-- search_engines: Google, Bing, DuckDuckGo advanced search
-- social_media: LinkedIn, Twitter, Facebook intelligence
-- business_directories: Business listings and directories
-- job_portals: Job sites and professional networks
-- specialized_tools: Technical analysis tools
-
-Modules:
-- IntelligentSearchCollector: Advanced search engine data collection
-- SocialMediaIntelligenceCollector: Social media intelligence gathering
-- BusinessDirectoryCollector: Business directory data collection
-- JobPortalsCollector: Professional network data collection
-- SpecializedToolsCollector: Technical analysis tools integration
+Business Directories Intelligence Collector
+File Location: collectors/business_directories.py
+Advanced Business Directory Data Collection with AI Analysis
 """
 
-from .search_engines import IntelligentSearchCollector
-from .social_media import SocialMediaIntelligenceCollector
-from .business_directories import BusinessDirectoryCollector
-from .job_portals import JobPortalsCollector
-from .specialized_tools import SpecializedToolsCollector
-
-__all__ = [
-    'IntelligentSearchCollector',
-    'SocialMediaIntelligenceCollector',
-    'BusinessDirectoryCollector',
-    'JobPortalsCollector',
-    'SpecializedToolsCollector'
-]
-
-# ============================================================================
-# collectors/business_directories.py - جامع أدلة الأعمال
-# ============================================================================
-
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime
-import logging
 import asyncio
 import aiohttp
-import random
 import re
+import json
+import random
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import logging
+from urllib.parse import quote, urljoin, urlparse
+from bs4 import BeautifulSoup
+import time
 
-from ..utils.validation import ValidationRules
-from ..utils.patterns import SearchPatterns
+# Import utilities
+from utils.rate_limiter import RateLimiter
+from utils.proxy_manager import ProxyManager
+from utils.patterns import SearchPatterns
+from utils.validation import ValidationRules
 
 logger = logging.getLogger(__name__)
 
 @dataclass
 class BusinessListing:
-    """Business directory listing"""
+    """Business directory listing data structure"""
     name: str
     address: str
     phone: Optional[str]
@@ -66,9 +43,9 @@ class BusinessListing:
     metadata: Dict[str, Any]
 
 class BusinessDirectoryCollector:
-    """Business directory intelligence collector"""
+    """Advanced business directory intelligence collector"""
     
-    WEIGHTS = {
+    CONFIDENCE_WEIGHTS = {
         'completeness': 0.6,
         'consistency': 0.4
     }
@@ -76,1325 +53,699 @@ class BusinessDirectoryCollector:
     def __init__(self):
         self.validation = ValidationRules()
         self.patterns = SearchPatterns()
+        self.rate_limiter = RateLimiter()
+        self.proxy_manager = ProxyManager()
+        
+        # Business directory sources
         self.directories = {
-            'google_business': 'https://www.google.com/maps',
-            'yelp': 'https://www.yelp.com',
-            'yellowpages': 'https://www.yellowpages.com',
-            'foursquare': 'https://foursquare.com'
+            'google_business': {
+                'name': 'Google My Business',
+                'base_url': 'https://www.google.com/maps',
+                'search_pattern': '/search/{query}',
+                'weight': 0.9
+            },
+            'yelp': {
+                'name': 'Yelp Business Directory',
+                'base_url': 'https://www.yelp.com',
+                'search_pattern': '/search?find_desc={query}&find_loc={location}',
+                'weight': 0.8
+            },
+            'yellowpages': {
+                'name': 'Yellow Pages',
+                'base_url': 'https://www.yellowpages.com',
+                'search_pattern': '/search?search_terms={query}&geo_location_terms={location}',
+                'weight': 0.7
+            },
+            'foursquare': {
+                'name': 'Foursquare Places',
+                'base_url': 'https://foursquare.com',
+                'search_pattern': '/explore?mode=url&near={location}&q={query}',
+                'weight': 0.6
+            }
+        }
+        
+        # Business categories mapping
+        self.business_categories = {
+            'hospitality': ['hotel', 'restaurant', 'cafe', 'resort', 'inn', 'motel'],
+            'technology': ['software', 'tech', 'IT', 'digital', 'computer', 'programming'],
+            'healthcare': ['medical', 'health', 'clinic', 'hospital', 'dental', 'pharmacy'],
+            'retail': ['store', 'shop', 'market', 'boutique', 'outlet', 'mall'],
+            'automotive': ['car', 'auto', 'vehicle', 'garage', 'repair', 'dealership'],
+            'finance': ['bank', 'financial', 'insurance', 'investment', 'accounting'],
+            'education': ['school', 'university', 'training', 'education', 'learning'],
+            'real_estate': ['real estate', 'property', 'housing', 'apartment', 'rental'],
+            'professional_services': ['consulting', 'legal', 'marketing', 'advertising'],
+            'beauty': ['salon', 'spa', 'beauty', 'cosmetic', 'barber', 'nail']
         }
     
     async def comprehensive_directory_search(self, target: str, params: Dict) -> List[BusinessListing]:
-        """Comprehensive business directory search"""
-        logger.info(f"Business directory search for: {target}")
+        """
+        Comprehensive business directory search across multiple sources
+        """
+        logger.info(f"Starting comprehensive business directory search for: {target}")
         
         all_listings = []
         location = params.get('geographic_focus', '')
+        search_depth = params.get('search_depth', 'standard')
         
-        # Search across multiple directories
-        search_tasks = [
-            self._search_google_business(target, location),
-            self._search_yelp(target, location),
-            self._search_yellowpages(target, location)
-        ]
+        # Determine which directories to search based on depth
+        directories_to_search = self._select_directories(search_depth)
         
-        # Execute searches
-        results = await asyncio.gather(*search_tasks, return_exceptions=True)
+        # Parallel search across selected directories
+        search_tasks = []
+        for directory_id in directories_to_search:
+            task = self._search_directory(directory_id, target, location, params)
+            search_tasks.append(task)
         
-        for result in results:
-            if isinstance(result, list):
-                all_listings.extend(result)
+        # Execute searches with rate limiting
+        try:
+            results = await asyncio.gather(*search_tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, list):
+                    all_listings.extend(result)
+                elif isinstance(result, Exception):
+                    logger.error(f"Directory search error: {result}")
         
-        # Remove duplicates and return
-        unique_listings = self._deduplicate_listings(all_listings)
-        return sorted(unique_listings, key=lambda x: x.confidence_score, reverse=True)
+        except Exception as e:
+            logger.error(f"Error in parallel directory search: {e}")
+        
+        # Process and deduplicate results
+        processed_listings = self._process_listings(all_listings)
+        
+        # Sort by confidence and relevance
+        ranked_listings = self._rank_listings_by_relevance(processed_listings, target, params)
+        
+        logger.info(f"Directory search completed: {len(ranked_listings)} unique listings found")
+        return ranked_listings
     
-    async def _search_google_business(self, target: str, location: str) -> List[BusinessListing]:
-        """Search Google My Business (simulation)"""
+    def _select_directories(self, search_depth: str) -> List[str]:
+        """Select directories based on search depth"""
+        if search_depth == 'quick':
+            return ['google_business']
+        elif search_depth == 'standard':
+            return ['google_business', 'yelp']
+        else:  # comprehensive
+            return list(self.directories.keys())
+    
+    async def _search_directory(self, directory_id: str, target: str, location: str, params: Dict) -> List[BusinessListing]:
+        """Search specific business directory"""
+        directory_info = self.directories.get(directory_id)
+        if not directory_info:
+            return []
+        
+        logger.info(f"Searching {directory_info['name']} for: {target}")
+        
+        try:
+            await self.rate_limiter.wait_if_needed(directory_id)
+            
+            # Generate search queries
+            search_queries = self._generate_search_queries(target, location)
+            
+            listings = []
+            for query in search_queries[:3]:  # Limit queries per directory
+                query_results = await self._perform_directory_search(directory_id, query, location)
+                listings.extend(query_results)
+                
+                # Break if we have enough results
+                if len(listings) >= 20:
+                    break
+            
+            # Enhance listings with directory-specific data
+            enhanced_listings = self._enhance_directory_listings(listings, directory_id, directory_info)
+            
+            return enhanced_listings
+            
+        except Exception as e:
+            logger.error(f"Error searching {directory_info['name']}: {e}")
+            return []
+    
+    def _generate_search_queries(self, target: str, location: str) -> List[str]:
+        """Generate optimized search queries for directories"""
+        queries = []
+        
+        # Base query
+        queries.append(target)
+        
+        # Query with location
+        if location:
+            queries.append(f"{target} {location}")
+            queries.append(f"{target} in {location}")
+        
+        # Category-specific queries
+        detected_category = self._detect_business_category(target)
+        if detected_category:
+            category_terms = self.business_categories[detected_category]
+            for term in category_terms[:2]:  # Use top 2 related terms
+                if term.lower() not in target.lower():
+                    queries.append(f"{term} {location}" if location else term)
+        
+        # Enhanced queries
+        if 'hotel' in target.lower() or 'accommodation' in target.lower():
+            queries.extend([f"hotels {location}", f"accommodation {location}"])
+        elif 'restaurant' in target.lower() or 'dining' in target.lower():
+            queries.extend([f"restaurants {location}", f"dining {location}"])
+        elif 'tech' in target.lower() or 'software' in target.lower():
+            queries.extend([f"technology companies {location}", f"software companies {location}"])
+        
+        return queries
+    
+    def _detect_business_category(self, target: str) -> Optional[str]:
+        """Detect business category from target"""
+        target_lower = target.lower()
+        
+        for category, keywords in self.business_categories.items():
+            if any(keyword in target_lower for keyword in keywords):
+                return category
+        
+        return None
+    
+    async def _perform_directory_search(self, directory_id: str, query: str, location: str) -> List[BusinessListing]:
+        """Perform actual search on specific directory"""
+        # This is a simulation of directory search
+        # In real implementation, this would make actual HTTP requests
+        
+        if directory_id == 'google_business':
+            return await self._simulate_google_business_search(query, location)
+        elif directory_id == 'yelp':
+            return await self._simulate_yelp_search(query, location)
+        elif directory_id == 'yellowpages':
+            return await self._simulate_yellowpages_search(query, location)
+        elif directory_id == 'foursquare':
+            return await self._simulate_foursquare_search(query, location)
+        
+        return []
+    
+    async def _simulate_google_business_search(self, query: str, location: str) -> List[BusinessListing]:
+        """Simulate Google My Business search results"""
         listings = []
         
-        # Simulate Google Business search
-        for i in range(random.randint(3, 8)):
+        # Generate realistic business listings
+        for i in range(random.randint(5, 12)):
             listing = BusinessListing(
-                name=f"{target} Business {i+1}",
-                address=f"123 Business St, {location}",
+                name=f"{query.title()} Business {i+1}",
+                address=f"{random.randint(100, 9999)} Business Street, {location}",
                 phone=f"+966{random.randint(500000000, 599999999)}",
-                website=f"https://{target.replace(' ', '').lower()}{i+1}.com",
-                category=self._categorize_business(target),
+                website=f"https://{query.replace(' ', '').lower()}{i+1}.com",
+                category=self._detect_business_category(query) or 'general_business',
                 rating=round(random.uniform(3.5, 5.0), 1),
                 reviews_count=random.randint(10, 500),
-                description=f"Professional {target} services in {location}",
+                description=f"Professional {query} services in {location}. Established business with excellent customer service.",
                 source_directory='google_business',
-                listing_url=f"https://maps.google.com/business{i+1}",
-                confidence_score=random.uniform(0.7, 0.95),
-                metadata={'search_term': target, 'location': location}
+                listing_url=f"https://maps.google.com/place/business{i+1}",
+                confidence_score=random.uniform(0.8, 0.95),
+                metadata={
+                    'search_query': query,
+                    'location': location,
+                    'business_hours': '9 AM - 6 PM',
+                    'verified': random.choice([True, False]),
+                    'popular_times': ['12 PM', '1 PM', '6 PM']
+                }
             )
             listings.append(listing)
         
         return listings
     
-    async def _search_yelp(self, target: str, location: str) -> List[BusinessListing]:
-        """Search Yelp (simulation)"""
+    async def _simulate_yelp_search(self, query: str, location: str) -> List[BusinessListing]:
+        """Simulate Yelp search results"""
         listings = []
         
-        for i in range(random.randint(2, 6)):
+        for i in range(random.randint(3, 8)):
             listing = BusinessListing(
-                name=f"{target} Yelp {i+1}",
-                address=f"456 Yelp Ave, {location}",
+                name=f"{query} Yelp {i+1}",
+                address=f"{random.randint(100, 9999)} Yelp Avenue, {location}",
                 phone=f"+966{random.randint(500000000, 599999999)}" if random.choice([True, False]) else None,
-                website=f"https://yelp{i+1}.com" if random.choice([True, False]) else None,
-                category=self._categorize_business(target),
+                website=f"https://business{i+1}.com" if random.choice([True, False]) else None,
+                category=self._detect_business_category(query) or 'general_business',
                 rating=round(random.uniform(3.0, 5.0), 1),
                 reviews_count=random.randint(5, 200),
-                description=f"Highly rated {target} in {location}",
+                description=f"Highly rated {query} in {location}. Great customer reviews and service quality.",
                 source_directory='yelp',
                 listing_url=f"https://yelp.com/biz/business{i+1}",
                 confidence_score=random.uniform(0.6, 0.9),
-                metadata={'search_term': target, 'location': location}
+                metadata={
+                    'search_query': query,
+                    'location': location,
+                    'price_range': random.choice(['$', '$$', '$$$', '$$$$']),
+                    'delivery_available': random.choice([True, False]),
+                    'top_reviews': ['Great service', 'Excellent quality', 'Highly recommended']
+                }
             )
             listings.append(listing)
         
         return listings
     
-    async def _search_yellowpages(self, target: str, location: str) -> List[BusinessListing]:
-        """Search Yellow Pages (simulation)"""
+    async def _simulate_yellowpages_search(self, query: str, location: str) -> List[BusinessListing]:
+        """Simulate Yellow Pages search results"""
         listings = []
         
-        for i in range(random.randint(1, 4)):
+        for i in range(random.randint(2, 6)):
             listing = BusinessListing(
-                name=f"{target} YP {i+1}",
-                address=f"789 Yellow St, {location}",
+                name=f"{query} YP {i+1}",
+                address=f"{random.randint(100, 9999)} Yellow Street, {location}",
                 phone=f"+966{random.randint(500000000, 599999999)}",
                 website=None,  # Yellow Pages often has phone but no website
-                category=self._categorize_business(target),
-                rating=None,
+                category=self._detect_business_category(query) or 'general_business',
+                rating=None,  # Yellow Pages doesn't always have ratings
                 reviews_count=None,
-                description=f"Established {target} business in {location}",
+                description=f"Established {query} business in {location}. Contact for professional services.",
                 source_directory='yellowpages',
                 listing_url=f"https://yellowpages.com/business{i+1}",
                 confidence_score=random.uniform(0.5, 0.8),
-                metadata={'search_term': target, 'location': location}
+                metadata={
+                    'search_query': query,
+                    'location': location,
+                    'years_in_business': random.randint(1, 25),
+                    'business_type': 'local_business'
+                }
             )
             listings.append(listing)
         
         return listings
     
-    def _categorize_business(self, target: str) -> str:
-        """Categorize business based on target"""
-        target_lower = target.lower()
+    async def _simulate_foursquare_search(self, query: str, location: str) -> List[BusinessListing]:
+        """Simulate Foursquare search results"""
+        listings = []
         
-        categories = {
-            'restaurant': ['restaurant', 'food', 'dining', 'cafe'],
-            'hotel': ['hotel', 'accommodation', 'resort', 'inn'],
-            'technology': ['software', 'tech', 'IT', 'digital'],
-            'healthcare': ['medical', 'health', 'clinic', 'hospital'],
-            'retail': ['store', 'shop', 'retail', 'market'],
-            'professional_services': ['consulting', 'legal', 'accounting', 'finance']
-        }
+        for i in range(random.randint(2, 5)):
+            listing = BusinessListing(
+                name=f"{query} 4SQ {i+1}",
+                address=f"{random.randint(100, 9999)} Square Plaza, {location}",
+                phone=f"+966{random.randint(500000000, 599999999)}" if random.choice([True, False]) else None,
+                website=f"https://square{i+1}.com" if random.choice([True, False]) else None,
+                category=self._detect_business_category(query) or 'general_business',
+                rating=round(random.uniform(3.2, 4.8), 1),
+                reviews_count=random.randint(8, 150),
+                description=f"Popular {query} destination in {location}. Great atmosphere and service.",
+                source_directory='foursquare',
+                listing_url=f"https://foursquare.com/v/business{i+1}",
+                confidence_score=random.uniform(0.6, 0.85),
+                metadata={
+                    'search_query': query,
+                    'location': location,
+                    'check_ins': random.randint(50, 2000),
+                    'tips_count': random.randint(5, 50),
+                    'categories': [self._detect_business_category(query) or 'general']
+                }
+            )
+            listings.append(listing)
         
-        for category, keywords in categories.items():
-            if any(keyword in target_lower for keyword in keywords):
-                return category
-        
-        return 'general_business'
+        return listings
     
-    def _deduplicate_listings(self, listings: List[BusinessListing]) -> List[BusinessListing]:
-        """Remove duplicate listings"""
-        seen_names = set()
+    def _enhance_directory_listings(self, listings: List[BusinessListing], directory_id: str, directory_info: Dict) -> List[BusinessListing]:
+        """Enhance listings with directory-specific data"""
+        enhanced_listings = []
+        
+        for listing in listings:
+            # Apply directory weight to confidence score
+            listing.confidence_score *= directory_info['weight']
+            
+            # Add directory-specific metadata
+            listing.metadata['directory_weight'] = directory_info['weight']
+            listing.metadata['directory_name'] = directory_info['name']
+            listing.metadata['search_timestamp'] = datetime.now().isoformat()
+            
+            # Validate and clean data
+            if self._validate_listing(listing):
+                enhanced_listings.append(listing)
+        
+        return enhanced_listings
+    
+    def _validate_listing(self, listing: BusinessListing) -> bool:
+        """Validate business listing data quality"""
+        # Basic validation checks
+        if not listing.name or len(listing.name) < 2:
+            return False
+        
+        if not listing.address or len(listing.address) < 10:
+            return False
+        
+        # Validate phone if present
+        if listing.phone:
+            if not self._validate_phone_number(listing.phone):
+                listing.phone = None  # Remove invalid phone
+        
+        # Validate website if present
+        if listing.website:
+            if not self._validate_website_url(listing.website):
+                listing.website = None  # Remove invalid website
+        
+        # Check for suspicious patterns
+        suspicious_patterns = ['test', 'example', 'sample', 'dummy']
+        if any(pattern in listing.name.lower() for pattern in suspicious_patterns):
+            return False
+        
+        return True
+    
+    def _validate_phone_number(self, phone: str) -> bool:
+        """Validate phone number format"""
+        # Clean phone number
+        cleaned = re.sub(r'[^\d+]', '', phone)
+        
+        # Check various phone patterns
+        patterns = [
+            r'^\+966[5][0-9]{8}$',  # Saudi mobile
+            r'^\+966[1-4][0-9]{7}$',  # Saudi landline
+            r'^\+971[5][0-9]{8}$',  # UAE mobile
+            r'^\+[1-9][0-9]{8,14}$'  # International
+        ]
+        
+        return any(re.match(pattern, cleaned) for pattern in patterns)
+    
+    def _validate_website_url(self, website: str) -> bool:
+        """Validate website URL"""
+        # Basic URL validation
+        url_pattern = r'^https?://(?:[\w-]+\.)+[\w-]+(?:/[\w-./?%&=]*)?$'
+        return bool(re.match(url_pattern, website))
+    
+    def _process_listings(self, listings: List[BusinessListing]) -> List[BusinessListing]:
+        """Process and deduplicate business listings"""
+        if not listings:
+            return []
+        
+        # Remove exact duplicates
+        unique_listings = self._remove_exact_duplicates(listings)
+        
+        # Remove similar duplicates (same name, similar address)
+        deduplicated_listings = self._remove_similar_duplicates(unique_listings)
+        
+        # Enhance with additional data
+        enhanced_listings = self._enhance_listings_data(deduplicated_listings)
+        
+        return enhanced_listings
+    
+    def _remove_exact_duplicates(self, listings: List[BusinessListing]) -> List[BusinessListing]:
+        """Remove exact duplicate listings"""
+        seen_combinations = set()
         unique_listings = []
         
         for listing in listings:
-            name_key = listing.name.lower().replace(' ', '')
-            if name_key not in seen_names:
-                seen_names.add(name_key)
+            # Create unique identifier
+            identifier = f"{listing.name.lower().strip()}:{listing.address.lower().strip()}"
+            
+            if identifier not in seen_combinations:
+                seen_combinations.add(identifier)
                 unique_listings.append(listing)
         
+        logger.info(f"Removed {len(listings) - len(unique_listings)} exact duplicates")
         return unique_listings
-
-    def _calculate_confidence(self, completeness: float, consistency: float) -> float:
-        """Calculate final confidence score"""
-        return (completeness * self.WEIGHTS['completeness'] + 
-                consistency * self.WEIGHTS['consistency'])
-
-    async def _advanced_business_search(self, target: str, params: Dict) -> List[BusinessListing]:
-        """Perform advanced business search"""
-        listings = []
-        search_locations = params.get('locations', [])
-        
-        for location in search_locations:
-            tasks = [
-                self._search_local_directories(target, location),
-                self._search_industry_directories(target, location),
-                self._search_professional_networks(target, location)
-            ]
-            results = await asyncio.gather(*tasks)
-            for result in results:
-                listings.extend(result)
-        
-        return self._process_listings(listings)
     
-    async def _search_local_directories(self, target: str, location: str) -> List[BusinessListing]:
-        """Search local business directories"""
-        # Implementation similar to other search methods
-        listings = []
-        # Add local directory search logic
+    def _remove_similar_duplicates(self, listings: List[BusinessListing]) -> List[BusinessListing]:
+        """Remove similar duplicate listings using fuzzy matching"""
+        if len(listings) <= 1:
+            return listings
+        
+        # Group similar listings
+        groups = []
+        for listing in listings:
+            placed = False
+            
+            for group in groups:
+                # Check similarity with first item in group
+                if self._are_listings_similar(listing, group[0]):
+                    group.append(listing)
+                    placed = True
+                    break
+            
+            if not placed:
+                groups.append([listing])
+        
+        # Select best listing from each group
+        deduplicated = []
+        for group in groups:
+            if len(group) == 1:
+                deduplicated.append(group[0])
+            else:
+                # Select listing with highest confidence
+                best_listing = max(group, key=lambda x: x.confidence_score)
+                deduplicated.append(best_listing)
+        
+        logger.info(f"Removed {len(listings) - len(deduplicated)} similar duplicates")
+        return deduplicated
+    
+    def _are_listings_similar(self, listing1: BusinessListing, listing2: BusinessListing) -> bool:
+        """Check if two listings are similar"""
+        # Name similarity (simple approach)
+        name1_words = set(listing1.name.lower().split())
+        name2_words = set(listing2.name.lower().split())
+        name_overlap = len(name1_words.intersection(name2_words)) / max(len(name1_words), len(name2_words))
+        
+        # Address similarity
+        addr1_words = set(listing1.address.lower().split())
+        addr2_words = set(listing2.address.lower().split())
+        addr_overlap = len(addr1_words.intersection(addr2_words)) / max(len(addr1_words), len(addr2_words))
+        
+        # Phone similarity
+        phone_match = False
+        if listing1.phone and listing2.phone:
+            phone_match = listing1.phone == listing2.phone
+        
+        # Consider similar if high name overlap or same phone
+        return name_overlap > 0.7 or phone_match or (name_overlap > 0.5 and addr_overlap > 0.5)
+    
+    def _enhance_listings_data(self, listings: List[BusinessListing]) -> List[BusinessListing]:
+        """Enhance listings with additional computed data"""
+        for listing in listings:
+            # Calculate completeness score
+            listing.metadata['completeness_score'] = self._calculate_completeness_score(listing)
+            
+            # Add business insights
+            listing.metadata['business_insights'] = self._generate_business_insights(listing)
+            
+            # Normalize rating if present
+            if listing.rating:
+                listing.metadata['rating_normalized'] = min(listing.rating / 5.0, 1.0)
+            
+            # Categorize by business size (based on reviews)
+            if listing.reviews_count:
+                if listing.reviews_count > 200:
+                    listing.metadata['business_size'] = 'large'
+                elif listing.reviews_count > 50:
+                    listing.metadata['business_size'] = 'medium'
+                else:
+                    listing.metadata['business_size'] = 'small'
+        
         return listings
-
-    async def _search_industry_directories(self, target: str, location: str) -> List[BusinessListing]:
-        """Search industry-specific directories"""
-        # Implementation similar to other search methods
-        listings = []
-        # Add industry directory search logic
-        return listings
-
-    async def _search_professional_networks(self, target: str, location: str) -> List[BusinessListing]:
-        """Search professional networks"""
-        # Implementation similar to other search methods
-        listings = []
-        # Add professional network search logic
-        return listings
-
-    def _process_listings(self, listings: List[BusinessListing]) -> List[BusinessListing]:
-        """Process and validate business listings"""
-        processed = []
-        seen = set()
+    
+    def _calculate_completeness_score(self, listing: BusinessListing) -> float:
+        """Calculate data completeness score"""
+        total_fields = 8
+        filled_fields = 0
+        
+        if listing.name: filled_fields += 1
+        if listing.address: filled_fields += 1
+        if listing.phone: filled_fields += 1
+        if listing.website: filled_fields += 1
+        if listing.category: filled_fields += 1
+        if listing.rating: filled_fields += 1
+        if listing.reviews_count: filled_fields += 1
+        if listing.description: filled_fields += 1
+        
+        return filled_fields / total_fields
+    
+    def _generate_business_insights(self, listing: BusinessListing) -> Dict[str, Any]:
+        """Generate business insights from listing data"""
+        insights = {}
+        
+        # Contact availability
+        contact_methods = []
+        if listing.phone: contact_methods.append('phone')
+        if listing.website: contact_methods.append('website')
+        insights['contact_methods'] = contact_methods
+        insights['contact_score'] = len(contact_methods) / 2.0
+        
+        # Reputation indicators
+        if listing.rating and listing.reviews_count:
+            if listing.rating >= 4.0 and listing.reviews_count >= 50:
+                insights['reputation'] = 'excellent'
+            elif listing.rating >= 3.5:
+                insights['reputation'] = 'good'
+            else:
+                insights['reputation'] = 'average'
+        
+        # Business maturity (based on reviews count)
+        if listing.reviews_count:
+            if listing.reviews_count > 100:
+                insights['maturity'] = 'established'
+            elif listing.reviews_count > 20:
+                insights['maturity'] = 'developing'
+            else:
+                insights['maturity'] = 'new'
+        
+        # Directory presence
+        insights['directory_presence'] = listing.source_directory
+        insights['source_reliability'] = self.directories[listing.source_directory]['weight']
+        
+        return insights
+    
+    def _rank_listings_by_relevance(self, listings: List[BusinessListing], target: str, params: Dict) -> List[BusinessListing]:
+        """Rank listings by relevance to search target"""
+        if not listings:
+            return []
+        
+        target_words = set(target.lower().split())
+        priority_data = params.get('priority_data', [])
+        geographic_focus = params.get('geographic_focus', '').lower()
         
         for listing in listings:
-            # Generate unique key for deduplication
-            key = f"{listing.name}:{listing.address}"
-            if key not in seen:
-                seen.add(key)
-                if self._validate_listing(listing):
-                    processed.append(listing)
-        
-        return processed
-
-    def _validate_listing(self, listing: BusinessListing) -> bool:
-        """Validate business listing data"""
-        if not listing.name or not listing.address:
-            return False
+            relevance_score = listing.confidence_score
             
-        # Basic validation checks
-        if len(listing.name) < 2 or len(listing.address) < 5:
-            return False
+            # Name relevance (40% weight)
+            name_words = set(listing.name.lower().split())
+            name_overlap = len(target_words.intersection(name_words)) / max(len(target_words), 1)
+            relevance_score += name_overlap * 0.4
             
-        # Validate phone if present
-        if listing.phone and not self._validate_phone(listing.phone):
-            listing.phone = None
+            # Geographic relevance (20% weight)
+            if geographic_focus and geographic_focus in listing.address.lower():
+                relevance_score += 0.2
             
-        # Validate website if present
-        if listing.website and not self._validate_website(listing.website):
-            listing.website = None
+            # Category relevance (15% weight)
+            if listing.category:
+                category_lower = listing.category.lower()
+                if any(word in category_lower for word in target_words):
+                    relevance_score += 0.15
             
-        return True
-
-    def _validate_phone(self, phone: str) -> bool:
-        """Validate phone number format"""
-        # Basic phone validation
-        phone = phone.replace(' ', '').replace('-', '')
-        return bool(re.match(r'^\+?[0-9]{8,15}$', phone))
-
-    def _validate_website(self, website: str) -> bool:
-        """Validate website URL"""
-        # Basic URL validation
-        return bool(re.match(r'^https?://(?:[\w-]+\.)+[\w-]+(?:/[\w-./?%&=]*)?$', website))
-
-    def _enrich_listing_data(self, listing: BusinessListing) -> BusinessListing:
-        """Enrich business listing with additional data"""
-        # Add enrichment logic here
-        return listing
-
-# ============================================================================
-# collectors/job_portals_collector.py - جامع مواقع التوظيف
-# ============================================================================
-
-import asyncio
-import random
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime, timedelta
-import logging
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class JobPortalProfile:
-    """Job portal candidate profile"""
-    name: str
-    title: str
-    skills: List[str]
-    experience_years
-    location: str
-    education: str
-    current_status: str  # "looking", "open", "employed"
-    last_active: datetime
-    profile_url: str
-    contact_info: Dict[str, str]
-    resume_keywords: List[str]
-    salary_expectation: Optional[str]
-    source_portal: str
-    confidence_score: float
-    metadata: Dict[str, Any]
-
-class JobPortalsCollector:
-    """Job portals intelligence collector"""
-    
-    def __init__(self):
-        self.portals = {
-            'linkedin_jobs': 'LinkedIn Jobs',
-            'indeed': 'Indeed',
-            'bayt': 'Bayt.com',
-            'glassdoor': 'Glassdoor',
-            'monster': 'Monster'
-        }
-    
-    async def comprehensive_job_portal_search(self, target: str, params: Dict) -> List[JobPortalProfile]:
-        """Comprehensive job portal search"""
-        logger.info(f"Job portal search for: {target}")
-        
-        all_profiles = []
-        location = params.get('geographic_focus', '')
-        
-        # Parallel search across portals
-        search_tasks = [
-            self._search_linkedin_jobs(target, location),
-            self._search_indeed(target, location),
-            self._search_bayt(target, location)
-        ]
-        
-        results = await asyncio.gather(*search_tasks, return_exceptions=True)
-        
-        for result in results:
-            if isinstance(result, list):
-                all_profiles.extend(result)
-        
-        # Process and rank profiles
-        unique_profiles = self._deduplicate_profiles(all_profiles)
-        ranked_profiles = self._rank_by_relevance(unique_profiles, target)
-        
-        return ranked_profiles[:50]  # Return top 50
-    
-    async def _search_linkedin_jobs(self, target: str, location: str) -> List[JobPortalProfile]:
-        """Search LinkedIn Jobs (simulation)"""
-        profiles = []
-        
-        # Extract job role from target
-        job_role = self._extract_job_role(target)
-        
-        for i in range(random.randint(5, 12)):
-            profile = JobPortalProfile(
-                name=f"Professional {i+1}",
-                title=f"{job_role} Specialist",
-                skills=self._generate_relevant_skills(job_role),
-                experience_years=random.randint(1, 15),
-                location=location,
-                education=random.choice(['Bachelor', 'Master', 'PhD', 'Diploma']),
-                current_status=random.choice(['looking', 'open', 'employed']),
-                last_active=datetime.now() - timedelta(days=random.randint(1, 30)),
-                profile_url=f"https://linkedin.com/in/professional{i+1}",
-                contact_info={
-                    'email': f"professional{i+1}@email.com" if random.choice([True, False]) else None,
-                    'phone': f"+966{random.randint(500000000, 599999999)}" if random.choice([True, False]) else None
-                },
-                resume_keywords=self._generate_resume_keywords(target, job_role),
-                salary_expectation=f"{random.randint(5000, 25000)} SAR" if random.choice([True, False]) else None,
-                source_portal='linkedin_jobs',
-                confidence_score=random.uniform(0.7, 0.95),
-                metadata={'search_term': target, 'location': location}
-            )
-            profiles.append(profile)
-        
-        return profiles
-    
-    async def _search_indeed(self, target: str, location: str) -> List[JobPortalProfile]:
-        """Search Indeed (simulation)"""
-        profiles = []
-        job_role = self._extract_job_role(target)
-        
-        for i in range(random.randint(3, 8)):
-            profile = JobPortalProfile(
-                name=f"Candidate {i+1}",
-                title=f"{job_role}",
-                skills=self._generate_relevant_skills(job_role),
-                experience_years=random.randint(1, 12),
-                location=location,
-                education=random.choice(['Bachelor', 'Master', 'Diploma']),
-                current_status='looking',  # Indeed typically has active job seekers
-                last_active=datetime.now() - timedelta(days=random.randint(1, 14)),
-                profile_url=f"https://indeed.com/profile{i+1}",
-                contact_info={
-                    'email': f"candidate{i+1}@email.com"
-                },
-                resume_keywords=self._generate_resume_keywords(target, job_role),
-                salary_expectation=f"{random.randint(4000, 20000)} SAR",
-                source_portal='indeed',
-                confidence_score=random.uniform(0.6, 0.85),
-                metadata={'search_term': target, 'location': location}
-            )
-            profiles.append(profile)
-        
-        return profiles
-    
-    async def _search_bayt(self, target: str, location: str) -> List[JobPortalProfile]:
-        """Search Bayt.com (simulation)"""
-        profiles = []
-        job_role = self._extract_job_role(target)
-        
-        for i in range(random.randint(2, 6)):
-            profile = JobPortalProfile(
-                name=f"Professional {i+1}",
-                title=f"Senior {job_role}",
-                skills=self._generate_relevant_skills(job_role),
-                experience_years=random.randint(2, 10),
-                location=location,
-                education=random.choice(['Bachelor', 'Master']),
-                current_status=random.choice(['looking', 'open']),
-                last_active=datetime.now() - timedelta(days=random.randint(1, 21)),
-                profile_url=f"https://bayt.com/profile{i+1}",
-                contact_info={
-                    'phone': f"+966{random.randint(500000000, 599999999)}"
-                },
-                resume_keywords=self._generate_resume_keywords(target, job_role),
-                salary_expectation=None,  # Bayt often doesn't show salary expectations
-                source_portal='bayt',
-                confidence_score=random.uniform(0.5, 0.8),
-                metadata={'search_term': target, 'location': location}
-            )
-            profiles.append(profile)
-        
-        return profiles
-    
-    def _extract_job_role(self, target: str) -> str:
-        """Extract job role from target description"""
-        target_lower = target.lower()
-        
-        roles = {
-            'developer': ['developer', 'programmer', 'coder'],
-            'engineer': ['engineer', 'engineering'],
-            'manager': ['manager', 'management'],
-            'analyst': ['analyst', 'analysis'],
-            'designer': ['designer', 'design'],
-            'consultant': ['consultant', 'consulting'],
-            'specialist': ['specialist', 'expert']
-        }
-        
-        for role, keywords in roles.items():
-            if any(keyword in target_lower for keyword in keywords):
-                return role
-        
-        return 'professional'
-    
-    def _generate_relevant_skills(self, job_role: str) -> List[str]:
-        """Generate relevant skills for job role"""
-        skill_sets = {
-            'developer': ['Python', 'JavaScript', 'React', 'Node.js', 'SQL', 'Git'],
-            'engineer': ['Engineering', 'Project Management', 'AutoCAD', 'MATLAB'],
-            'manager': ['Leadership', 'Project Management', 'Strategic Planning', 'Team Building'],
-            'analyst': ['Data Analysis', 'Excel', 'SQL', 'Python', 'Statistics'],
-            'designer': ['Photoshop', 'Illustrator', 'UI/UX', 'Creative Design'],
-            'consultant': ['Strategic Consulting', 'Business Analysis', 'Client Management']
-        }
-        
-        base_skills = skill_sets.get(job_role, ['Communication', 'Problem Solving'])
-        return random.sample(base_skills, min(len(base_skills), random.randint(3, 6)))
-    
-    def _generate_resume_keywords(self, target: str,
-        keywords.extend([word for word in target_words if len(word) > 3])
-        
-        # Add role-specific keywords
-        role_keywords = {
-            'developer': ['coding', 'programming', 'software development'],
-            'engineer': ['engineering', 'technical', 'problem solving'],
-            'manager': ['management', 'leadership', 'team'],
-            'analyst': ['analysis', 'data', 'reporting']
-        }
-        
-        if job_role in role_keywords:
-            keywords.extend(role_keywords[job_role])
-        
-        return list(set(keywords))
-    
-    def _deduplicate_profiles(self, profiles: List[JobPortalProfile]) -> List[JobPortalProfile]:
-        """Remove duplicate profiles"""
-        seen_names = set()
-        unique_profiles = []
-        
-        for profile in profiles:
-            name_key = profile.name.lower().replace(' ', '')
-            if name_key not in seen_names:
-                seen_names.add(name_key)
-                unique_profiles.append(profile)
-        
-        return unique_profiles
-    
-    def _rank_by_relevance(self, profiles: List[JobPortalProfile], target: str) -> List[JobPortalProfile]:
-        """Rank profiles by relevance to target"""
-        target_words = set(target.lower().split())
-        
-        for profile in profiles:
-            relevance_score = profile.confidence_score
+            # Contact information bonus (10% weight)
+            if 'contact_info' in priority_data:
+                contact_bonus = 0
+                if listing.phone: contact_bonus += 0.05
+                if listing.website: contact_bonus += 0.05
+                relevance_score += contact_bonus
             
-            # Title relevance (30%)
-            title_words = set(profile.title.lower().split())
-            title_matches = len(target_words.intersection(title_words))
-            relevance_score += (title_matches / len(target_words)) * 0.3
+            # Rating and reviews bonus (10% weight)
+            if listing.rating and listing.reviews_count:
+                rating_score = (listing.rating / 5.0) * (min(listing.reviews_count / 100, 1.0))
+                relevance_score += rating_score * 0.1
             
-            # Skills relevance (20%)
-            skill_words = set(' '.join(profile.skills).lower().split())
-            skill_matches = len(target_words.intersection(skill_words))
-            relevance_score += (skill_matches / len(target_words)) * 0.2
+            # Source reliability (5% weight)
+            source_weight = self.directories[listing.source_directory]['weight']
+            relevance_score += source_weight * 0.05
             
-            # Experience bonus (15%)
-            if profile.experience_years >= 5:
-                relevance_score += 0.15
-            elif profile.experience_years >= 3:
-                relevance_score += 0.1
+            listing.confidence_score = min(relevance_score, 1.0)
+        
+        # Sort by relevance score
+        return sorted(listings, key=lambda x: x.confidence_score, reverse=True)
+    
+    async def extract_contact_information(self, listings: List[BusinessListing]) -> List[Dict[str, Any]]:
+        """Extract and validate contact information from listings"""
+        contacts = []
+        
+        for listing in listings:
+            # Extract email from website if available
+            if listing.website:
+                emails = await self._extract_emails_from_website(listing.website)
+                for email in emails:
+                    contacts.append({
+                        'type': 'email',
+                        'value': email,
+                        'source_listing': listing.name,
+                        'source_url': listing.listing_url,
+                        'confidence': 0.8,
+                        'validation_status': 'pending'
+                    })
             
-            # Education bonus (10%)
-            if profile.education.lower() in ['phd', 'master']:
-                relevance_score += 0.1
-            elif profile.education.lower() == 'bachelor':
-                relevance_score += 0.05
+            # Add phone contact
+            if listing.phone:
+                contacts.append({
+                    'type': 'phone',
+                    'value': listing.phone,
+                    'source_listing': listing.name,
+                    'source_url': listing.listing_url,
+                    'confidence': 0.9,
+                    'validation_status': 'valid' if self._validate_phone_number(listing.phone) else 'invalid'
+                })
             
-            # Contact info completeness (15%)
-            contact_score = 0
-            if profile.contact_info.get('email'):
-                contact_score += 0.075
-            if profile.contact_info.get('phone'):
-                contact_score += 0.075
-            relevance_score += contact_score
-            
-            # Active status bonus (10%)
-            if profile.current_status == 'looking':
-                relevance_score += 0.1
-            elif profile.current_status == 'open':
-                relevance_score += 0.05
-            
-            # Normalize final score
-            profile.confidence_score = min(relevance_score, 1.0)
+            # Add website contact
+            if listing.website:
+                contacts.append({
+                    'type': 'website',
+                    'value': listing.website,
+                    'source_listing': listing.name,
+                    'source_url': listing.listing_url,
+                    'confidence': 0.7,
+                    'validation_status': 'valid' if self._validate_website_url(listing.website) else 'invalid'
+                })
         
-        return sorted(profiles, key=lambda x: x.confidence_score, reverse=True)
-
-    def _validate_profile(self, profile: JobPortalProfile) -> bool:
-        """Validate job portal profile data"""
-        if not profile.name or not profile.title:
-            return False
-            
-        # Basic validation
-        if len(profile.name) < 3 or len(profile.title) < 3:
-            return False
-            
-        # Skills validation
-        if not profile.skills or len(profile.skills) < 2:
-            return False
-            
-        # Experience validation
-        if not isinstance(profile.experience_years, (int, float)) or profile.experience_years < 0:
-            return False
-            
-        return True
-
-    def _enrich_profile_data(self, profile: JobPortalProfile) -> JobPortalProfile:
-        """Enrich profile with additional data"""
-        # Add profile summary
-        profile.metadata['summary'] = self._generate_profile_summary(profile)
-        
-        # Add profile completeness score
-        profile.metadata['completeness_score'] = self._calculate_profile_completeness(profile)
-        
-        # Add skill categories
-        profile.metadata['skill_categories'] = self._categorize_skills(profile.skills)
-        
-        return profile
-        
-    def _generate_profile_summary(self, profile: JobPortalProfile) -> str:
-        """Generate a brief profile summary"""
-        return (f"{profile.name} is a {profile.title} with {profile.experience_years} years "
-                f"of experience in {', '.join(profile.skills[:3])}. "
-                f"Currently {profile.current_status} and based in {profile.location}.")
-
-    def _calculate_profile_completeness(self, profile: JobPortalProfile) -> float:
-        """Calculate profile completeness score"""
-        required_fields = ['name', 'title', 'skills', 'location', 'education']
-        optional_fields = ['contact_info', 'salary_expectation', 'resume_keywords']
-        
-        # Required fields score (70%)
-        required_score = sum(1 for field in required_fields if getattr(profile, field)) / len(required_fields) * 0.7
-        
-        # Optional fields score (30%)
-        optional_score = sum(1 for field in optional_fields if getattr(profile, field)) / len(optional_fields) * 0.3
-        
-        return required_score + optional_score
-
-    def _categorize_skills(self, skills: List[str]) -> Dict[str, List[str]]:
-        """Categorize skills into different areas"""
-        categories = {
-            'technical': ['python', 'java', 'sql', 'aws', 'cloud'],
-            'soft_skills': ['communication', 'leadership', 'teamwork'],
-            'management': ['project management', 'agile', 'scrum'],
-            'analysis': ['data analysis', 'research', 'reporting']
-        }
-        
-        categorized = {cat: [] for cat in categories}
-        
-        for skill in skills:
-            skill_lower = skill.lower()
-            for category, keywords in categories.items():
-                if any(keyword in skill_lower for keyword in keywords):
-                    categorized[category].append(skill)
-                    break
-        
-        return {k: v for k, v in categorized.items() if v}  # Remove empty categories
-
-# ============================================================================
-# collectors/specialized_tools_collector.py - جامع الأدوات المتخصصة
-# ============================================================================
-
-import asyncio
-import random
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime
-import logging
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class TechnicalIntelligence:
-    """Technical intelligence data"""
-    data_type: str  # 'domain_info', 'security_scan', 'technology_stack'
-    target: str
-    findings: Dict[str, Any]
-    confidence_score: float
-    source_tool: str
-    scan_timestamp: datetime
-    metadata: Dict[str, Any]
-
-class SpecializedToolsCollector:
-    """Specialized OSINT tools collector"""
+        return contacts
     
-    def __init__(self):
-        self.tools = {
-            'whois': 'Domain registration information',
-            'dns_analysis': 'DNS record analysis',
-            'ssl_analysis': 'SSL certificate analysis',
-            'technology_detection': 'Technology stack detection',
-            'security_scan': 'Basic security assessment'
-        }
+    async def _extract_emails_from_website(self, website_url: str) -> List[str]:
+        """Extract email addresses from website (simulation)"""
+        # This would normally scrape the website for email addresses
+        # For now, we'll simulate email extraction
+        
+        emails = []
+        domain = urlparse(website_url).netloc
+        
+        # Common email patterns for businesses
+        common_prefixes = ['info', 'contact', 'sales', 'support', 'hello']
+        
+        for prefix in common_prefixes[:2]:  # Limit to avoid spam
+            if random.choice([True, False]):  # Simulate finding email
+                emails.append(f"{prefix}@{domain}")
+        
+        return emails
     
-    async def specialized_intelligence_gathering(self, target: str, params: Dict) -> List[TechnicalIntelligence]:
-        """Comprehensive specialized intelligence gathering"""
-        logger.info(f"Specialized intelligence gathering for: {target}")
-        
-        all_intelligence = []
-        
-        # Determine target type and applicable tools
-        target_type = self._determine_target_type(target)
-        
-        if target_type == 'domain':
-            # Domain-specific tools
-            tools_to_run = [
-                self._whois_analysis(target),
-                self._dns_analysis(target),
-                self._ssl_analysis(target),
-                self._technology_detection(target),
-                self._security_scan(target)
-            ]
-        elif target_type == 'company':
-            # Company-specific tools
-            tools_to_run = [
-                self._company_technology_analysis(target),
-                self._digital_footprint_analysis(target)
-            ]
-        else:
-            # General analysis
-            tools_to_run = [
-                self._general_intelligence_scan(target)
-            ]
-        
-        # Execute all tools
-        results = await asyncio.gather(*tools_to_run, return_exceptions=True)
-        
-        for result in results:
-            if isinstance(result, TechnicalIntelligence):
-                all_intelligence.append(result)
-            elif isinstance(result, Exception):
-                logger.error(f"Tool execution error: {result}")
-        
-        return all_intelligence
-    
-    def _determine_target_type(self, target: str) -> str:
-        """Determine target type for appropriate tool selection"""
-        if '.' in target and ' ' not in target:
-            return 'domain'
-        elif any(indicator in target.lower() for indicator in ['company', 'corp', 'ltd', 'inc']):
-            return 'company'
-        else:
-            return 'general'
-    
-    async def _whois_analysis(self, domain: str) -> TechnicalIntelligence:
-        """WHOIS information analysis (simulation)"""
-        # Simulate WHOIS lookup
-        whois_data = {
-            'domain_name': domain,
-            'registrar': 'Example Registrar Inc.',
-            'creation_date': '2020-01-15',
-            'expiration_date': '2025-01-15',
-            'name_servers': ['ns1.example.com', 'ns2.example.com'],
-            'registrant_country': 'SA',
-            'registrant_organization': f'Organization for {domain}',
-            'admin_email': f'admin@{domain}',
-            'privacy_protection': random.choice([True, False])
-        }
-        
-        return TechnicalIntelligence(
-            data_type='domain_info',
-            target=domain,
-            findings=whois_data,
-            confidence_score=0.95,
-            source_tool='whois',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'whois_lookup'}
-        )
-    
-    async def _dns_analysis(self, domain: str) -> TechnicalIntelligence:
-        """DNS record analysis (simulation)"""
-        dns_records = {
-            'A_records': [f'192.168.1.{random.randint(1, 255)}'],
-            'MX_records': [f'mail.{domain}', f'mail2.{domain}'],
-            'NS_records': [f'ns1.{domain}', f'ns2.{domain}'],
-            'TXT_records': [
-                'v=spf1 include:_spf.google.com ~all',
-                'google-site-verification=example123'
-            ],
-            'CNAME_records': {f'www.{domain}': domain},
-            'subdomain_count': random.randint(5, 25)
-        }
-        
-        return TechnicalIntelligence(
-            data_type='dns_info',
-            target=domain,
-            findings=dns_records,
-            confidence_score=0.9,
-            source_tool='dns_analysis',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'dns_enumeration'}
-        )
-    
-    async def _ssl_analysis(self, domain: str) -> TechnicalIntelligence:
-        """SSL certificate analysis (simulation)"""
-        ssl_info = {
-            'certificate_valid': True,
-            'issuer': 'Let\'s Encrypt Authority X3',
-            'subject': f'CN={domain}',
-            'valid_from': '2024-01-01',
-            'valid_until': '2025-01-01',
-            'signature_algorithm': 'sha256WithRSAEncryption',
-            'key_size': 2048,
-            'san_domains': [f'www.{domain}', f'mail.{domain}'],
-            'security_rating': random.choice(['A+', 'A', 'B']),
-            'vulnerabilities': []
-        }
-        
-        return TechnicalIntelligence(
-            data_type='ssl_info',
-            target=domain,
-            findings=ssl_info,
-            confidence_score=0.85,
-            source_tool='ssl_analysis',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'ssl_certificate_check'}
-        )
-    
-    async def _technology_detection(self, domain: str) -> TechnicalIntelligence:
-        """Technology stack detection (simulation)"""
-        technologies = {
-            'web_server': random.choice(['Apache', 'Nginx', 'IIS']),
-            'programming_language': random.choice(['PHP', 'Python', 'Node.js', 'Java']),
-            'framework': random.choice(['React', 'Angular', 'Vue.js', 'Laravel']),
-            'database': random.choice(['MySQL', 'PostgreSQL', 'MongoDB']),
-            'cdn': random.choice(['Cloudflare', 'AWS CloudFront', 'None']),
-            'analytics': random.choice(['Google Analytics', 'Adobe Analytics', 'None']),
-            'cms': random.choice(['WordPress', 'Drupal', 'Custom', 'None']),
-            'javascript_libraries': ['jQuery', 'Bootstrap'],
-            'hosting_provider': random.choice(['AWS', 'Google Cloud', 'Azure', 'Local'])
-        }
-        
-        return TechnicalIntelligence(
-            data_type='technology_stack',
-            target=domain,
-            findings=technologies,
-            confidence_score=0.8,
-            source_tool='technology_detection',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'technology_fingerprinting'}
-        )
-    
-    async def _security_scan(self, domain: str) -> TechnicalIntelligence:
-        """Basic security assessment (simulation)"""
-        security_findings = {
-            'open_ports': [80, 443, 22] if random.choice([True, False]) else [80, 443],
-            'ssl_vulnerabilities': [],
-            'security_headers': {
-                'strict_transport_security': random.choice([True, False]),
-                'content_security_policy': random.choice([True, False]),
-                'x_frame_options': random.choice([True, False])
-            },
-            'directory_listing': random.choice([True, False]),
-            'admin_panels_found': random.choice([True, False]),
-            'backup_files_found': random.choice([True, False]),
-            'security_score': random.randint(70, 95)
-        }
-        
-        return TechnicalIntelligence(
-            data_type='security_scan',
-            target=domain,
-            findings=security_findings,
-            confidence_score=0.75,
-            source_tool='security_scan',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'basic_security_assessment'}
-        )
-    
-    async def _company_technology_analysis(self, company: str) -> TechnicalIntelligence:
-        """Company technology analysis (simulation)"""
-        tech_analysis = {
-            'digital_maturity': random.choice(['basic', 'intermediate', 'advanced']),
-            'online_presence': {
-                'website': True,
-                'social_media': random.choice([True, False]),
-                'mobile_app': random.choice([True, False]),
-                'e_commerce': random.choice([True, False])
-            },
-            'technology_adoption': {
-                'cloud_services': random.choice(['AWS', 'Azure', 'Google Cloud', 'None']),
-                'crm_system': random.choice(['Salesforce', 'HubSpot', 'Custom', 'None']),
-                'erp_system': random.choice(['SAP', 'Oracle', 'Microsoft', 'None'])
-            },
-            'innovation_indicators': random.randint(1, 10)
-        }
-        
-        return TechnicalIntelligence(
-            data_type='company_technology',
-            target=company,
-            findings=tech_analysis,
-            confidence_score=0.7,
-            source_tool='company_tech_analysis',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'company_technology_assessment'}
-        )
-    
-    async def _digital_footprint_analysis(self, company: str) -> TechnicalIntelligence:
-        """Digital footprint analysis (simulation)"""
-        footprint = {
-            'domain_count': random.randint(1, 10),
-            'subdomain_count': random.randint(5, 50),
-            'social_media_accounts': random.randint(2, 8),
-            'online_mentions': random.randint(10, 1000),
-            'digital_presence_score': random.randint(40, 95),
-            'brand_protection': {
-                'trademark_domains': random.randint(0, 5),
-                'typosquatting_domains': random.randint(0, 3)
+    def get_directory_statistics(self) -> Dict[str, Any]:
+        """Get statistics about directory searches"""
+        return {
+            'supported_directories': list(self.directories.keys()),
+            'directory_weights': {k: v['weight'] for k, v in self.directories.items()},
+            'supported_categories': list(self.business_categories.keys()),
+            'validation_rules': {
+                'phone_patterns': ['Saudi', 'UAE', 'International'],
+                'required_fields': ['name', 'address'],
+                'optional_fields': ['phone', 'website', 'rating']
             }
         }
-        
-        return TechnicalIntelligence(
-            data_type='digital_footprint',
-            target=company,
-            findings=footprint,
-            confidence_score=0.65,
-            source_tool='digital_footprint_analysis',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'digital_footprint_assessment'}
-        )
+
+# Example usage and testing
+async def test_business_directory_collector():
+    """Test the business directory collector"""
+    collector = BusinessDirectoryCollector()
     
-    async def _general_intelligence_scan(self, target: str) -> TechnicalIntelligence:
-        """General intelligence scan (simulation)"""
-        general_findings = {
-            'target_type': 'general',
-            'information_found': random.choice([True, False]),
-            'related_entities': [f'Related Entity {i+1}' for i in range(random.randint(1, 5))],
-            'confidence_level': random.choice(['low', 'medium', 'high']),
-            'additional_research_needed': random.choice([True, False])
+    test_queries = [
+        "hotels in Riyadh",
+        "restaurants in Dubai", 
+        "technology companies in Saudi Arabia",
+        "medical clinics in Jeddah"
+    ]
+    
+    for query in test_queries:
+        print(f"\n=== Testing business directory search for: {query} ===")
+        
+        params = {
+            'geographic_focus': 'Saudi Arabia',
+            'search_depth': 'standard',
+            'priority_data': ['contact_info', 'business_info'],
+            'time_limit': 5
         }
         
-        return TechnicalIntelligence(
-            data_type='general_scan',
-            target=target,
-            findings=general_findings,
-            confidence_score=0.6,
-            source_tool='general_scan',
-            scan_timestamp=datetime.now(),
-            metadata={'scan_type': 'general_intelligence_gathering'}
-        )
-
-# ============================================================================
-# Example usage and comprehensive test
-# ============================================================================
-
-async def test_complete_system():
-    """Test the complete OSINT system"""
-    from core.discovery_engine import AdvancedDiscoveryEngine
-    from core.ai_analyzer import IntelligenceAnalyzer
-    
-    print("=== Testing Complete Advanced OSINT System ===")
-    
-    # Initialize system
-    discovery_engine = AdvancedDiscoveryEngine()
-    ai_analyzer = IntelligenceAnalyzer()
-    
-    # Test questionnaire data
-    questionnaire_data = {
-        'context': 'lead_generation',
-        'data_priorities': 'contact_info', 'decision_makers', '# ============================================================================
-# utils/rate_limiter.py - تحديد معدل الطلبات المحسن
-# ============================================================================
-
-import asyncio
-import time
-from collections import defaultdict, deque
-from typing import Dict, Optional
-import logging
-
-logger = logging.getLogger(__name__)
-
-class RateLimiter:
-    """Advanced rate limiter with adaptive capabilities"""
-    
-    def __init__(self):
-        self.requests_per_minute = 30
-        self.delay_between_requests = 2.0
-        self.last_request_time = defaultdict(float)
-        self.request_history = defaultdict(deque)
-        self.adaptive_delays = defaultdict(float)
-        self.blocked_sources = defaultdict(float)
-        
-    def configure(self, requests_per_minute: int = 30, delay_between_requests: float = 2.0):
-        """Configure rate limiting parameters"""
-        self.requests_per_minute = requests_per_minute
-        self.delay_between_requests = delay_between_requests
-        logger.info(f"Rate limiter configured: {requests_per_minute} req/min, {delay_between_requests}s delay")
-    
-    async def wait_if_needed(self, source: str = "default") -> None:
-        """Intelligent rate limiting with adaptive delays"""
-        current_time = time.time()
-        
-        # Check if source is temporarily blocked
-        if source in self.blocked_sources:
-            block_time = self.blocked_sources[source]
-            if current_time < block_time:
-                wait_time = block_time - current_time
-                logger.warning(f"Source {source} blocked for {wait_time:.1f} more seconds")
-                await asyncio.sleep(wait_time)
-                return
-            else:
-                del self.blocked_sources[source]
-        
-        # Update request history
-        history = self.request_history[source]
-        history.append(current_time)
-        
-        # Remove old requests (older than 1 minute)
-        while history and history[0] < current_time - 60:
-            history.popleft()
-        
-        # Check if we're exceeding rate limits
-        if len(history) >= self.requests_per_minute:
-            oldest_request = history[0]
-            wait_time = 60 - (current_time - oldest_request)
-            if wait_time > 0:
-                logger.info(f"Rate limit reached for {source}, waiting {wait_time:.1f}s")
-                await asyncio.sleep(wait_time)
-        
-        # Apply base delay
-        last_time = self.last_request_time[source]
-        base_delay = self.delay_between_requests
-        
-        # Apply adaptive delay if needed
-        adaptive_delay = self.adaptive_delays.get(source, 0)
-        total_delay = max(base_delay, adaptive_delay)
-        
-        time_since_last = current_time - last_time
-        if time_since_last < total_delay:
-            wait_time = total_delay - time_since_last
-            await asyncio.sleep(wait_time)
-        
-        self.last_request_time[source] = time.time()
-    
-    def increase_delay(self, source: str, factor: float = 1.5):
-        """Increase delay for a source (when getting blocked/rate limited)"""
-        current_delay = self.adaptive_delays.get(source, self.delay_between_requests)
-        new_delay = min(current_delay * factor, 30.0)  # Max 30 seconds
-        self.adaptive_delays[source] = new_delay
-        logger.warning(f"Increased delay for {source} to {new_delay:.1f}s")
-    
-    def decrease_delay(self, source: str, factor: float = 0.9):
-        """Decrease delay for a source (when requests are successful)"""
-        if source in self.adaptive_delays:
-            current_delay = self.adaptive_delays[source]
-            new_delay = max(current_delay * factor, self.delay_between_requests)
-            self.adaptive_delays[source] = new_delay
-    
-    def block_source(self, source: str, duration: float = 300):
-        """Temporarily block a source (5 minutes default)"""
-        block_until = time.time() + duration
-        self.blocked_sources[source] = block_until
-        logger.error(f"Blocked source {source} for {duration} seconds")
-
-# ============================================================================
-# utils/proxy_manager.py - إدارة البروكسي المتقدمة
-# ============================================================================
-
-import random
-import aiohttp
-from pathlib import Path
-from typing import List, Optional, Dict
-import logging
-
-logger = logging.getLogger(__name__)
-
-class ProxyManager:
-    """Advanced proxy management with health checking"""
-    
-    def __init__(self):
-        self.enabled = False
-        self.proxies = []
-        self.current_proxy_index = 0
-        self.proxy_health = {}
-        self.failed_proxies = set()
-        
-    def configure(self, enabled: bool = False, proxy_file: Optional[str] = None, proxy_list: Optional[List[str]] = None):
-        """Configure proxy settings"""
-        self.enabled = enabled
-        
-        if enabled:
-            if proxy_list:
-                self.proxies = proxy_list
-            elif proxy_file:
-                self.load_proxies(proxy_file)
-            else:
-                logger.warning("Proxy enabled but no proxy source provided")
-                self.enabled = False
-        
-        logger.info(f"Proxy manager configured: enabled={enabled}, proxies={len(self.proxies)}")
-    
-    def load_proxies(self, proxy_file: str):
-        """Load proxies from file"""
         try:
-            proxy_path = Path(proxy_file)
-            if proxy_path.exists():
-                with open(proxy_path, 'r') as f:
-                    self.proxies = [line.strip() for line in f.readlines() if line.strip()]
-                logger.info(f"Loaded {len(self.proxies)} proxies from {proxy_file}")
-            else:
-                logger.error(f"Proxy file not found: {proxy_file}")
-                self.enabled = False
+            results = await collector.comprehensive_directory_search(query, params)
+            print(f"Found {len(results)} business listings")
+            
+            # Show top 3 results
+            for i, listing in enumerate(results[:3], 1):
+                print(f"{i}. {listing.name}")
+                print(f"   Address: {listing.address}")
+                print(f"   Phone: {listing.phone or 'N/A'}")
+                print(f"   Rating: {listing.rating or 'N/A'}")
+                print(f"   Source: {listing.source_directory}")
+                print(f"   Confidence: {listing.confidence_score:.2f}")
+                print(f"   URL: {listing.listing_url}")
+                print()
+                
+            # Extract contact information
+            contacts = await collector.extract_contact_information(results)
+            print(f"Extracted {len(contacts)} contact information items")
+            
+            # Show statistics
+            stats = collector.get_directory_statistics()
+            print(f"Supported directories: {', '.join(stats['supported_directories'])}")
+            
         except Exception as e:
-            logger.error(f"Error loading proxies: {e}")
-            self.enabled = False
-    
-    def get_proxy(self) -> Optional[str]:
-        """Get next working proxy"""
-        if not self.enabled or not self.proxies:
-            return None
-        
-        # Filter out failed proxies
-        working_proxies = [p for p in self.proxies if p not in self.failed_proxies]
-        
-        if not working_proxies:
-            # Reset failed proxies if all are failed
-            self.failed_proxies.clear()
-            working_proxies = self.proxies
-        
-        # Return random working proxy
-        return random.choice(working_proxies) if working_proxies else None
-    
-    def mark_proxy_failed(self, proxy: str):
-        """Mark a proxy as failed"""
-        if proxy:
-            self.failed_proxies.add(proxy)
-            logger.warning(f"Marked proxy as failed: {proxy}")
-    
-    def mark_proxy_working(self, proxy: str):
-        """Mark a proxy as working"""
-        if proxy in self.failed_proxies:
-            self.failed_proxies.remove(proxy)
-            logger.info(f"Proxy restored: {proxy}")
-    
-    async def test_proxy(self, proxy: str, timeout: int = 10) -> bool:
-        """Test if a proxy is working"""
-        try:
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=timeout)) as session:
-                async with session.get('http://httpbin.org/ip', proxy=proxy) as response:
-                    if response.status == 200:
-                        self.mark_proxy_working(proxy)
-                        return True
-        except Exception as e:
-            logger.debug(f"Proxy test failed for {proxy}: {e}")
-        
-        self.mark_proxy_failed(proxy)
-        return False
-    
-    async def health_check_all(self) -> Dict[str, bool]:
-        """Health check all proxies"""
-        if not self.proxies:
-            return {}
-        
-        results = {}
-        for proxy in self.proxies:
-            results[proxy] = await self.test_proxy(proxy)
-        
-        working_count = sum(results.values())
-        logger.info(f"Proxy health check: {working_count}/{len(self.proxies)} working")
-        
-        return results
+            print(f"Error: {e}")
 
-# ============================================================================
-# utils/patterns.py - أنماط البحث والاستخراج
-# ============================================================================
-
-import re
-from typing import Dict, List, Pattern
-import json
-from pathlib import Path
-
-class SearchPatterns:
-    """Advanced search patterns and data extraction"""
-    
-    def __init__(self):
-        self.google_dorks = self._initialize_google_dorks()
-        self.validation_patterns = self._initialize_validation_patterns()
-        self.extraction_patterns = self._initialize_extraction_patterns()
-        
-    def _initialize_google_dorks(self) -> Dict[str, List[str]]:
-        """Initialize comprehensive Google Dork patterns"""
-        return {
-            'contact_discovery': [
-                'site:{domain} "contact" OR "email" OR "phone"',
-                'site:{domain} "@{domain}" -www',
-                'site:{domain} filetype:pdf "contact"',
-                '"{company}" "email" OR "contact" -site:{domain}',
-                '"{company}" "@" site:linkedin.com',
-                'site:{domain} "staff" OR "team" OR "employees"',
-                'site:{domain} "about us" OR "meet the team"'
-            ],
-            'employee_discovery': [
-                '"{company}" site:linkedin.com/in/',
-                '"{company}" "manager" OR "director" OR "CEO"',
-                '"{company}" "@{domain}" site:linkedin.com',
-                '"{company}" "works at" OR "employee"',
-                'site:{domain} "bio" OR "biography"'
-            ],
-            'business_intelligence': [
-                '"{company}" "revenue" OR "employees" OR "funding"',
-                '"{company}" "CEO" OR "founder" OR "president"',
-                '"{company}" "office" OR "headquarters"',
-                '"{company}" "news" OR "press release"',
-                'site:{domain} "investor" OR "funding"'
-            ],
-            'vulnerability_discovery': [
-                'site:{domain} "admin" OR "login"',
-                'site:{domain} "database" OR "db"',
-                'site:{domain} intitle:"index of"',
-                'site:{domain} "config" OR "backup"'
-            ],
-            'social_media_discovery': [
-                '"{company}" site:facebook.com',
-                '"{company}" site:twitter.com',
-                '"{company}" site:instagram.com',
-                '"{company}" site:youtube.com'
-            ]
-        }
-    
-    def _initialize_validation_patterns(self) -> Dict[str, Pattern]:
-        """Initialize validation regex patterns"""
-        return {
-            'email': re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
-            'phone_saudi': re.compile(r'(?:\+966|966|0)?(?:5[0-9])\d{7}\b'),
-            'phone_uae': re.compile(r'(?:\+971|971|0)?(?:5[0-9])\d{7}\b'),
-            'phone_international': re.compile(r'\+?[1-9]\d{1,14}\b'),
-            'domain': re.compile(r'\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b'),
-            'ip_address': re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'),
-            'linkedin_profile': re.compile(r'linkedin\.com/in/[a-zA-Z0-9-]+'),
-            'twitter_handle': re.compile(r'@[A-Za-z0-9_]+'),
-            'url': re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-        }
-    
-    def _initialize_extraction_patterns(self) -> Dict[str, Dict]:
-        """Initialize data extraction patterns"""
-        return {
-            'job_titles': {
-                'executive': ['ceo', 'president', 'founder', 'chief executive'],
-                'technical': ['cto', 'engineering manager', 'technical director', 'head of engineering'],
-                'sales': ['sales manager', 'business development', 'account manager'],
-                'marketing': ['marketing manager', 'brand manager', 'communications'],
-                'hr': ['hr manager', 'human resources', 'talent acquisition'],
-                'finance': ['cfo', 'finance manager', 'controller', 'accounting']
-            },
-            'company_types': {
-                'technology': ['software', 'tech', 'ai', 'digital', 'platform'],
-                'healthcare': ['medical', 'health', 'clinic', 'hospital'],
-                'finance': ['bank', 'financial', 'investment', 'insurance'],
-                'retail': ['retail', 'store', 'commerce', 'shopping'],
-                'manufacturing': ['manufacturing', 'factory', 'production']
-            },
-            'business_indicators': {
-                'size_small': ['startup', 'small business', 'boutique', 'family business'],
-                'size_medium': ['growing company', 'mid-size', 'expanding'],
-                'size_large': ['corporation', 'enterprise', 'multinational', 'global']
-            }
-        }
-    
-    def extract_emails(self, text: str) -> List[str]:
-        """Extract email addresses from text"""
-        return self.validation_patterns['email'].findall(text)
-    
-    def extract_phones(self, text: str, region: str = 'international') -> List[str]:
-        """Extract phone numbers from text"""
-        pattern_key = f'phone_{region}'
-        if pattern_key in self.validation_patterns:
-            return self.validation_patterns[pattern_key].findall(text)
-        return self.validation_patterns['phone_international'].findall(text)
-    
-    def extract_domains(self, text: str) -> List[str]:
-        """Extract domain names from text"""
-        return self.validation_patterns['domain'].findall(text)
-    
-    def extract_social_profiles(self, text: str) -> Dict[str, List[str]]:
-        """Extract social media profiles"""
-        return {
-            'linkedin': self.validation_patterns['linkedin_profile'].findall(text),
-            'twitter': self.validation_patterns['twitter_handle'].findall(text)
-        }
-    
-    def classify_job_title(self, title: str) -> str:
-        """Classify job title into category"""
-        title_lower = title.lower()
-        
-        for category, keywords in self.extraction_patterns['job_titles'].items():
-            if any(keyword in title_lower for keyword in keywords):
-                return category
-        
-        return 'other'
-    
-    def detect_company_type(self, text: str) -> str:
-        """Detect company type from text"""
-        text_lower = text.lower()
-        
-        for company_type, keywords in self.extraction_patterns['company_types'].items():
-            if any(keyword in text_lower for keyword in keywords):
-                return company_type
-        
-        return 'general'
-    
-    def estimate_company_size(self, text: str) -> str:
-        """Estimate company size from text indicators"""
-        text_lower = text.lower()
-        
-        for size_category, indicators in self.extraction_patterns['business_indicators'].items():
-            if any(indicator in text_lower for indicator in indicators):
-                return size_category.replace('size_', '')
-        
-        return 'unknown'
-
-# ============================================================================
-# utils/validation_rules.py - قواعد التحقق المتقدمة
-# ============================================================================
-
-import re
-import dns.resolver
-import validators
-from typing import Dict, List, Tuple, Optional
-import logging
-
-logger = logging.getLogger(__name__)
-
-class ValidationRules:
-    """Advanced validation rules for OSINT data"""
-    
-    WEIGHTS = {
-        'completeness': 0.6,
-        'consistency': 0.4
-    }
-    
-    def __init__(self):
-        self.patterns = SearchPatterns()
-        self.domain_cache = {}
-        self._init_validation_configs()
-    
-    def _init_validation_configs(self):
-        """Initialize validation configurations"""
-        self.required_fields = ['name', 'industry', 'location']
-        self.personal_domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com']
-        self.suspicious_patterns = ['noreply', 'donotreply', 'test', 'temp', 'fake']
-        self.suspicious_tlds = ['.tk', '.ml', '.ga', '.cf']
-        self.confidence_weights = {
-            'format': 0.3,
-            'domain': 0.2,
-            'mx_record': 0.3,
-            'business_email': 0.2
-        }
-    
-    def validate_business_info(self, business_data: Dict[str, any]) -> Dict[str, any]:
-        """Validate business information consistency"""
-        result = self._init_validation_result()
-        
-        if not business_data:
-            return result
-        
-        # Calculate completeness score
-        result['completeness_score'] = self._calculate_completeness(business_data)
-        
-        # Calculate consistency score
-        consistency_data = self._check_consistency(business_data)
-        result['consistency_score'] = consistency_data['score']
-        
-        # Calculate overall confidence
-        result['confidence'] = self._calculate_confidence(
-            result['completeness_score'], 
-            result['consistency_score']
-        )
-        result['valid'] = result['confidence'] >= 0.6
-        
-        return result
-    
-    def _init_validation_result(self) -> Dict[str, any]:
-        """Initialize validation result structure"""
-        return {
-            'valid': False,
-            'confidence': 0.0,
-            'consistency_score': 0.0,
-            'completeness_score': 0.0,
-            'risk_indicators': []
-        }
-    
-    def _calculate_completeness(self, data: Dict[str, any]) -> float:
-        """Calculate data completeness score"""
-        present_fields = sum(1 for field in self.required_fields if data.get(field))
-        return present_fields / len(self.required_fields)
-    
-    def _check_consistency(self, data: Dict[str, str], pattern_type: str) -> bool:
-        """Generic consistency checker"""
-        try:
-            if pattern_type == 'name_domain':
-                first = set(data['name'].lower().split())
-                second = set(data['domain'].replace('.', ' ').split())
-            elif pattern_type == 'location_phone':
-                location = data['location'].lower()
-                phone = data['phone']
-                return any(
-                    loc in location and self.patterns.validation_patterns[f'phone_{loc}'].search(phone)
-                    for loc in ['saudi', 'uae']
-                )
-            return bool(first.intersection(second))
-        except (KeyError, AttributeError):
-            return False
-    
-    def _calculate_confidence(self, scores: Dict[str, float]) -> float:
-        """Calculate weighted confidence score"""
-        return sum(
-            score * self.WEIGHTS.get(metric, 0)
-            for metric, score in scores.items()
-        )
-
-
-
+if __name__ == "__main__":
+    # Run test
+    asyncio.run(test_business_directory_collector())
