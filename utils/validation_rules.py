@@ -333,6 +333,325 @@ class ValidationRules:
         details['original_url'] = url
         
         # Format validation using validators library
-        format_valid = validators.url(url)
-        if format_valid:
-            confidence
+        try:
+            format_valid = validators.url(url)
+            if format_valid:
+                confidence += self.CONFIDENCE_WEIGHTS['url']['format']
+                details['format_valid'] = True
+            else:
+                errors.append('Invalid URL format')
+                details['format_valid'] = False
+        except:
+            # Fallback to regex validation
+            format_valid = bool(self.url_pattern.match(url))
+            if format_valid:
+                confidence += self.CONFIDENCE_WEIGHTS['url']['format']
+                details['format_valid'] = True
+            else:
+                errors.append('Invalid URL format')
+                details['format_valid'] = False
+        
+        # Extract domain from URL
+        try:
+            extracted = tldextract.extract(url)
+            domain = f"{extracted.domain}.{extracted.suffix}"
+            details['domain'] = domain
+            details['subdomain'] = extracted.subdomain
+            details['tld'] = extracted.suffix
+            
+            # Domain validation
+            domain_confidence = self._validate_domain(domain)
+            confidence += domain_confidence * 0.2
+            details['domain_confidence'] = domain_confidence
+            
+        except Exception as e:
+            errors.append(f'Failed to parse domain: {e}')
+            details['domain_parse_error'] = str(e)
+        
+        # Accessibility check (optional - can be slow)
+        # accessibility_valid = self._check_url_accessibility(url)
+        # if accessibility_valid:
+        #     confidence += self.CONFIDENCE_WEIGHTS['url']['accessibility']
+        #     details['is_accessible'] = True
+        
+        is_valid = format_valid and confidence >= 0.4
+        
+        return ValidationResult(
+            is_valid=is_valid,
+            confidence=min(confidence, 1.0),
+            validation_type='url',
+            details=details,
+            timestamp=datetime.now(),
+            errors=errors
+        )
+    
+    def validate_business_profile(self, profile: Dict[str, Any]) -> ValidationResult:
+        """Validate business profile data"""
+        errors = []
+        details = {}
+        confidence = 0.0
+        
+        # Required fields
+        required_fields = ['name', 'industry', 'location']
+        optional_fields = ['description', 'website', 'phone', 'email', 'size']
+        
+        # Check completeness
+        present_fields = sum(1 for field in required_fields if profile.get(field))
+        completeness = present_fields / len(required_fields)
+        confidence += completeness * self.CONFIDENCE_WEIGHTS['business']['completeness']
+        details['completeness'] = completeness
+        
+        # Check missing required fields
+        missing_fields = [field for field in required_fields if not profile.get(field)]
+        if missing_fields:
+            errors.extend([f'Missing required field: {field}' for field in missing_fields])
+        details['missing_fields'] = missing_fields
+        
+        # Validate individual fields
+        field_validations = {}
+        
+        # Business name validation
+        if profile.get('name'):
+            name_valid = self._validate_business_name(profile['name'])
+            field_validations['name'] = name_valid
+            if not name_valid:
+                errors.append('Invalid business name format')
+        
+        # Industry validation
+        if profile.get('industry'):
+            industry_valid = self._validate_industry(profile['industry'])
+            field_validations['industry'] = industry_valid
+        
+        # Location validation
+        if profile.get('location'):
+            location_valid = self._validate_location(profile['location'])
+            field_validations['location'] = location_valid
+        
+        # Email validation if present
+        if profile.get('email'):
+            email_result = self.validate_email(profile['email'])
+            field_validations['email'] = email_result.is_valid
+            details['email_validation'] = email_result.details
+        
+        # Phone validation if present
+        if profile.get('phone'):
+            phone_result = self.validate_phone(profile['phone'])
+            field_validations['phone'] = phone_result.is_valid
+            details['phone_validation'] = phone_result.details
+        
+        # Website validation if present
+        if profile.get('website'):
+            url_result = self.validate_url(profile['website'])
+            field_validations['website'] = url_result.is_valid
+            details['website_validation'] = url_result.details
+        
+        # Consistency check
+        consistency_score = sum(field_validations.values()) / len(field_validations) if field_validations else 0
+        confidence += consistency_score * self.CONFIDENCE_WEIGHTS['business']['consistency']
+        details['consistency_score'] = consistency_score
+        details['field_validations'] = field_validations
+        
+        is_valid = completeness >= 0.8 and consistency_score >= 0.7
+        
+        return ValidationResult(
+            is_valid=is_valid,
+            confidence=min(confidence, 1.0),
+            validation_type='business_profile',
+            details=details,
+            timestamp=datetime.now(),
+            errors=errors
+        )
+    
+    def validate_person_profile(self, profile: Dict[str, Any]) -> ValidationResult:
+        """Validate person profile data"""
+        errors = []
+        details = {}
+        confidence = 0.0
+        
+        # Required fields for person
+        required_fields = ['name', 'title']
+        optional_fields = ['company', 'location', 'email', 'phone', 'experience']
+        
+        # Check completeness
+        present_fields = sum(1 for field in required_fields if profile.get(field))
+        completeness = present_fields / len(required_fields)
+        confidence += completeness * 0.5
+        details['completeness'] = completeness
+        
+        # Validate name
+        if profile.get('name'):
+            name_valid = self._validate_person_name(profile['name'])
+            details['name_valid'] = name_valid
+            if name_valid:
+                confidence += 0.2
+        
+        # Validate title
+        if profile.get('title'):
+            title_valid = self._validate_professional_title(profile['title'])
+            details['title_valid'] = title_valid
+            if title_valid:
+                confidence += 0.2
+        
+        # Email validation if present
+        if profile.get('email'):
+            email_result = self.validate_email(profile['email'])
+            details['email_valid'] = email_result.is_valid
+            if email_result.is_valid:
+                confidence += 0.1
+        
+        is_valid = completeness >= 0.5 and confidence >= 0.5
+        
+        return ValidationResult(
+            is_valid=is_valid,
+            confidence=min(confidence, 1.0),
+            validation_type='person_profile',
+            details=details,
+            timestamp=datetime.now(),
+            errors=errors
+        )
+    
+    def _validate_domain(self, domain: str) -> float:
+        """Validate domain and return confidence score"""
+        if not domain:
+            return 0.0
+        
+        confidence = 0.5  # Base confidence
+        
+        try:
+            # Check if domain has valid TLD
+            extracted = tldextract.extract(domain)
+            if extracted.suffix:
+                confidence += 0.2
+            
+            # Check for suspicious TLD
+            if f".{extracted.suffix}" in self.suspicious_tlds:
+                confidence -= 0.3
+            
+            # Check domain length (reasonable business domains)
+            if 3 <= len(extracted.domain) <= 20:
+                confidence += 0.1
+            
+            return max(0.0, min(confidence, 1.0))
+            
+        except Exception:
+            return 0.1
+    
+    def _is_business_email(self, email: str, domain: str) -> bool:
+        """Check if email appears to be business email"""
+        # Not a personal domain
+        if domain.lower() in self.personal_domains:
+            return False
+        
+        # Has business-like domain structure
+        if '.' not in domain:
+            return False
+        
+        # Local part doesn't look personal
+        local_part = email.split('@')[0].lower()
+        personal_indicators = ['personal', 'private', 'home', 'family']
+        if any(indicator in local_part for indicator in personal_indicators):
+            return False
+        
+        return True
+    
+    def _check_mx_record(self, domain: str) -> bool:
+        """Check if domain has MX record"""
+        if domain in self._dns_cache:
+            return self._dns_cache[domain]
+        
+        try:
+            dns.resolver.resolve(domain, 'MX')
+            self._dns_cache[domain] = True
+            return True
+        except:
+            self._dns_cache[domain] = False
+            return False
+    
+    def _is_suspicious_email(self, email: str) -> bool:
+        """Check for suspicious email patterns"""
+        email_lower = email.lower()
+        return any(pattern in email_lower for pattern in self.suspicious_patterns)
+    
+    def _validate_business_name(self, name: str) -> bool:
+        """Validate business name format"""
+        if not name or len(name) < 2:
+            return False
+        
+        # Check for suspicious patterns
+        name_lower = name.lower()
+        if any(pattern in name_lower for pattern in ['test', 'temp', 'fake', 'example']):
+            return False
+        
+        return True
+    
+    def _validate_industry(self, industry: str) -> bool:
+        """Validate industry field"""
+        if not industry or len(industry) < 3:
+            return False
+        
+        # Common industries
+        valid_industries = [
+            'technology', 'healthcare', 'finance', 'retail', 'hospitality',
+            'manufacturing', 'education', 'real estate', 'consulting',
+            'logistics', 'energy', 'government', 'automotive', 'agriculture'
+        ]
+        
+        industry_lower = industry.lower()
+        return any(valid_ind in industry_lower for valid_ind in valid_industries)
+    
+    def _validate_location(self, location: str) -> bool:
+        """Validate location field"""
+        if not location or len(location) < 2:
+            return False
+        
+        # Check for suspicious patterns
+        location_lower = location.lower()
+        if any(pattern in location_lower for pattern in ['test', 'temp', 'fake', 'unknown']):
+            return False
+        
+        return True
+    
+    def _validate_person_name(self, name: str) -> bool:
+        """Validate person name"""
+        if not name or len(name) < 2:
+            return False
+        
+        # Check for reasonable name pattern
+        name_pattern = re.compile(r'^[A-Za-z\s.-]+$')
+        if not name_pattern.match(name):
+            return False
+        
+        # Should have at least first and last name
+        parts = name.split()
+        if len(parts) < 2:
+            return False
+        
+        return True
+    
+    def _validate_professional_title(self, title: str) -> bool:
+        """Validate professional title"""
+        if not title or len(title) < 3:
+            return False
+        
+        title_lower = title.lower()
+        
+        # Check for professional keywords
+        professional_keywords = [
+            'manager', 'director', 'engineer', 'analyst', 'specialist',
+            'coordinator', 'supervisor', 'officer', 'assistant', 'associate',
+            'consultant', 'advisor', 'representative', 'executive', 'lead'
+        ]
+        
+        return any(keyword in title_lower for keyword in professional_keywords + self.professional_titles)
+    
+    def get_validation_statistics(self) -> Dict[str, Any]:
+        """Get validation statistics"""
+        return {
+            'dns_cache_size': len(self._dns_cache),
+            'supported_validations': [
+                'email', 'phone', 'url', 'business_profile', 'person_profile'
+            ],
+            'supported_countries': list(self.phone_patterns.keys()),
+            'personal_domains_count': len(self.personal_domains),
+            'suspicious_patterns_count': len(self.suspicious_patterns)
+        }
