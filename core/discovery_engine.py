@@ -15,12 +15,14 @@ from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 
+from ..collectors.business_directories import BusinessDirectoryCollector
+from ..collectors.job_portals import JobPortalsCollector
+from ..collectors.specialized_tools import SpecializedToolsCollector
+from ..utils.rate_limiter import RateLimiter
+
 # Import collectors (will be implemented)
 from collectors.search_engines import IntelligentSearchCollector
 from collectors.social_media import SocialMediaIntelligenceCollector
-from collectors.business_directories import BusinessDirectoryCollector
-from collectors.job_portals_collector import JobPortalsCollector
-from collectors.specialized_tools_collector import SpecializedToolsCollector
 
 logger = logging.getLogger(__name__)
 
@@ -101,11 +103,51 @@ class AdvancedDiscoveryEngine:
     """
     
     def __init__(self):
-        self.collectors = self._initialize_collectors()
-        self.target_patterns = self._load_target_patterns()
-        self.keyword_generators = self._initialize_keyword_generators()
-        self.active_investigations = {}
+        self.business_collector = BusinessDirectoryCollector()
+        self.job_collector = JobPortalsCollector()
+        self.tools_collector = SpecializedToolsCollector()
+        self.rate_limiter = RateLimiter()
         
+    async def execute_discovery(self, target: str, params: Dict) -> Dict[str, Any]:
+        """Execute comprehensive discovery"""
+        logger.info(f"Starting discovery for target: {target}")
+        
+        # Initialize results container
+        results = {
+            'business_listings': [],
+            'job_profiles': [],
+            'technical_data': [],
+            'metadata': {
+                'target': target,
+                'timestamp': datetime.now(),
+                'parameters': params
+            }
+        }
+        
+        # Execute parallel collectors
+        tasks = [
+            self.business_collector.comprehensive_directory_search(target, params),
+            self.job_collector.comprehensive_job_portal_search(target, params),
+            self.tools_collector.specialized_intelligence_gathering(target, params)
+        ]
+        
+        collector_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Process results
+        for idx, result in enumerate(collector_results):
+            if isinstance(result, Exception):
+                logger.error(f"Collector {idx} failed: {result}")
+                continue
+            
+            if idx == 0:
+                results['business_listings'] = result
+            elif idx == 1:
+                results['job_profiles'] = result
+            elif idx == 2:
+                results['technical_data'] = result
+        
+        return results
+
     def _initialize_collectors(self) -> Dict[str, Any]:
         """Initialize all intelligence collectors"""
         return {

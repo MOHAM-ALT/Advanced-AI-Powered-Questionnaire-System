@@ -821,13 +821,19 @@ class ContactQualityAnalyzer:
         return recommendations
 
 class IntelligenceAnalyzer:
-    """Main AI-powered intelligence analyzer"""
+    """AI-powered intelligence analyzer"""
     
     def __init__(self):
         self.business_classifier = BusinessTypeClassifier()
         self.personnel_analyzer = PersonnelAnalyzer()
         self.contact_analyzer = ContactQualityAnalyzer()
         
+        self.analysis_weights = {
+            'business_listings': 0.4,
+            'job_profiles': 0.3,
+            'technical_data': 0.3
+        }
+    
     async def analyze_intelligence_batch(self, results: List[Dict[str, Any]]) -> IntelligenceAnalysis:
         """
         Comprehensive AI analysis of intelligence batch

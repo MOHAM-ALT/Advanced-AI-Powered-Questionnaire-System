@@ -42,6 +42,7 @@ import logging
 import asyncio
 import aiohttp
 import random
+import re
 
 from ..utils.validation import ValidationRules
 from ..utils.patterns import SearchPatterns
@@ -66,6 +67,11 @@ class BusinessListing:
 
 class BusinessDirectoryCollector:
     """Business directory intelligence collector"""
+    
+    WEIGHTS = {
+        'completeness': 0.6,
+        'consistency': 0.4
+    }
     
     def __init__(self):
         self.validation = ValidationRules()
@@ -203,6 +209,99 @@ class BusinessDirectoryCollector:
                 unique_listings.append(listing)
         
         return unique_listings
+
+    def _calculate_confidence(self, completeness: float, consistency: float) -> float:
+        """Calculate final confidence score"""
+        return (completeness * self.WEIGHTS['completeness'] + 
+                consistency * self.WEIGHTS['consistency'])
+
+    async def _advanced_business_search(self, target: str, params: Dict) -> List[BusinessListing]:
+        """Perform advanced business search"""
+        listings = []
+        search_locations = params.get('locations', [])
+        
+        for location in search_locations:
+            tasks = [
+                self._search_local_directories(target, location),
+                self._search_industry_directories(target, location),
+                self._search_professional_networks(target, location)
+            ]
+            results = await asyncio.gather(*tasks)
+            for result in results:
+                listings.extend(result)
+        
+        return self._process_listings(listings)
+    
+    async def _search_local_directories(self, target: str, location: str) -> List[BusinessListing]:
+        """Search local business directories"""
+        # Implementation similar to other search methods
+        listings = []
+        # Add local directory search logic
+        return listings
+
+    async def _search_industry_directories(self, target: str, location: str) -> List[BusinessListing]:
+        """Search industry-specific directories"""
+        # Implementation similar to other search methods
+        listings = []
+        # Add industry directory search logic
+        return listings
+
+    async def _search_professional_networks(self, target: str, location: str) -> List[BusinessListing]:
+        """Search professional networks"""
+        # Implementation similar to other search methods
+        listings = []
+        # Add professional network search logic
+        return listings
+
+    def _process_listings(self, listings: List[BusinessListing]) -> List[BusinessListing]:
+        """Process and validate business listings"""
+        processed = []
+        seen = set()
+        
+        for listing in listings:
+            # Generate unique key for deduplication
+            key = f"{listing.name}:{listing.address}"
+            if key not in seen:
+                seen.add(key)
+                if self._validate_listing(listing):
+                    processed.append(listing)
+        
+        return processed
+
+    def _validate_listing(self, listing: BusinessListing) -> bool:
+        """Validate business listing data"""
+        if not listing.name or not listing.address:
+            return False
+            
+        # Basic validation checks
+        if len(listing.name) < 2 or len(listing.address) < 5:
+            return False
+            
+        # Validate phone if present
+        if listing.phone and not self._validate_phone(listing.phone):
+            listing.phone = None
+            
+        # Validate website if present
+        if listing.website and not self._validate_website(listing.website):
+            listing.website = None
+            
+        return True
+
+    def _validate_phone(self, phone: str) -> bool:
+        """Validate phone number format"""
+        # Basic phone validation
+        phone = phone.replace(' ', '').replace('-', '')
+        return bool(re.match(r'^\+?[0-9]{8,15}$', phone))
+
+    def _validate_website(self, website: str) -> bool:
+        """Validate website URL"""
+        # Basic URL validation
+        return bool(re.match(r'^https?://(?:[\w-]+\.)+[\w-]+(?:/[\w-./?%&=]*)?$', website))
+
+    def _enrich_listing_data(self, listing: BusinessListing) -> BusinessListing:
+        """Enrich business listing with additional data"""
+        # Add enrichment logic here
+        return listing
 
 # ============================================================================
 # collectors/job_portals_collector.py - جامع مواقع التوظيف
@@ -434,30 +533,117 @@ class JobPortalsCollector:
         for profile in profiles:
             relevance_score = profile.confidence_score
             
-            # Check title relevance
+            # Title relevance (30%)
             title_words = set(profile.title.lower().split())
             title_matches = len(target_words.intersection(title_words))
             relevance_score += (title_matches / len(target_words)) * 0.3
             
-            # Check skills relevance
+            # Skills relevance (20%)
             skill_words = set(' '.join(profile.skills).lower().split())
             skill_matches = len(target_words.intersection(skill_words))
             relevance_score += (skill_matches / len(target_words)) * 0.2
             
-            # Boost for active profiles
-            days_since_active = (datetime.now() - profile.last_active).days
-            if days_since_active <= 7:
+            # Experience bonus (15%)
+            if profile.experience_years >= 5:
+                relevance_score += 0.15
+            elif profile.experience_years >= 3:
                 relevance_score += 0.1
-            elif days_since_active <= 30:
+            
+            # Education bonus (10%)
+            if profile.education.lower() in ['phd', 'master']:
+                relevance_score += 0.1
+            elif profile.education.lower() == 'bachelor':
                 relevance_score += 0.05
             
-            # Boost for available candidates
-            if profile.current_status in ['looking', 'open']:
-                relevance_score += 0.15
+            # Contact info completeness (15%)
+            contact_score = 0
+            if profile.contact_info.get('email'):
+                contact_score += 0.075
+            if profile.contact_info.get('phone'):
+                contact_score += 0.075
+            relevance_score += contact_score
             
+            # Active status bonus (10%)
+            if profile.current_status == 'looking':
+                relevance_score += 0.1
+            elif profile.current_status == 'open':
+                relevance_score += 0.05
+            
+            # Normalize final score
             profile.confidence_score = min(relevance_score, 1.0)
         
         return sorted(profiles, key=lambda x: x.confidence_score, reverse=True)
+
+    def _validate_profile(self, profile: JobPortalProfile) -> bool:
+        """Validate job portal profile data"""
+        if not profile.name or not profile.title:
+            return False
+            
+        # Basic validation
+        if len(profile.name) < 3 or len(profile.title) < 3:
+            return False
+            
+        # Skills validation
+        if not profile.skills or len(profile.skills) < 2:
+            return False
+            
+        # Experience validation
+        if not isinstance(profile.experience_years, (int, float)) or profile.experience_years < 0:
+            return False
+            
+        return True
+
+    def _enrich_profile_data(self, profile: JobPortalProfile) -> JobPortalProfile:
+        """Enrich profile with additional data"""
+        # Add profile summary
+        profile.metadata['summary'] = self._generate_profile_summary(profile)
+        
+        # Add profile completeness score
+        profile.metadata['completeness_score'] = self._calculate_profile_completeness(profile)
+        
+        # Add skill categories
+        profile.metadata['skill_categories'] = self._categorize_skills(profile.skills)
+        
+        return profile
+        
+    def _generate_profile_summary(self, profile: JobPortalProfile) -> str:
+        """Generate a brief profile summary"""
+        return (f"{profile.name} is a {profile.title} with {profile.experience_years} years "
+                f"of experience in {', '.join(profile.skills[:3])}. "
+                f"Currently {profile.current_status} and based in {profile.location}.")
+
+    def _calculate_profile_completeness(self, profile: JobPortalProfile) -> float:
+        """Calculate profile completeness score"""
+        required_fields = ['name', 'title', 'skills', 'location', 'education']
+        optional_fields = ['contact_info', 'salary_expectation', 'resume_keywords']
+        
+        # Required fields score (70%)
+        required_score = sum(1 for field in required_fields if getattr(profile, field)) / len(required_fields) * 0.7
+        
+        # Optional fields score (30%)
+        optional_score = sum(1 for field in optional_fields if getattr(profile, field)) / len(optional_fields) * 0.3
+        
+        return required_score + optional_score
+
+    def _categorize_skills(self, skills: List[str]) -> Dict[str, List[str]]:
+        """Categorize skills into different areas"""
+        categories = {
+            'technical': ['python', 'java', 'sql', 'aws', 'cloud'],
+            'soft_skills': ['communication', 'leadership', 'teamwork'],
+            'management': ['project management', 'agile', 'scrum'],
+            'analysis': ['data analysis', 'research', 'reporting']
+        }
+        
+        categorized = {cat: [] for cat in categories}
+        
+        for skill in skills:
+            skill_lower = skill.lower()
+            for category, keywords in categories.items():
+                if any(keyword in skill_lower for keyword in keywords):
+                    categorized[category].append(skill)
+                    break
+        
+        return {k: v for k, v in categorized.items() if v}  # Remove empty categories
 
 # ============================================================================
 # collectors/specialized_tools_collector.py - جامع الأدوات المتخصصة
