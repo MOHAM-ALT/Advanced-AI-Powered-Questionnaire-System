@@ -1,7 +1,14 @@
 @echo off
+setlocal EnableDelayedExpansion
 title Advanced OSINT System - Professional Builder
 color 0A
 chcp 65001 >nul
+
+:: Initialize
+set "REQUIRED_SPACE=2"
+set "MIN_PYTHON=3.8"
+set "SUCCESS_COUNT=0"
+set "ERROR_COUNT=0"
 
 echo ================================================================
 echo    Advanced OSINT Intelligence System - Professional Builder
@@ -17,9 +24,7 @@ if %errorLevel% neq 0 (
     exit /b 0
 )
 
-echo [✓] Administrator privileges confirmed
-echo [INFO] Starting professional build process...
-echo.
+echo [+] Admin rights verified
 
 :: Check Python installation
 echo [CHECK] Verifying Python installation...
@@ -32,94 +37,70 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
-echo [✓] Python %PYTHON_VERSION% detected
+for /f "tokens=2" %%i in ('python --version 2^>^&1') do set "PYTHON_VERSION=%%i"
+echo [+] Python %PYTHON_VERSION% compatible
 
 :: Check Python version
 python -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>&1
 if %errorLevel% neq 0 (
-    echo [✗] Python 3.8+ required. Current version: %PYTHON_VERSION%
+    echo [✗] Python %MIN_PYTHON%+ required. Current version: %PYTHON_VERSION%
     echo [INFO] Please upgrade Python to version 3.8 or higher
     pause
     exit /b 1
 )
 
-echo [✓] Python version compatible
+echo [+] Python version compatible
 
 :: Check available disk space
-for /f "tokens=3" %%i in ('dir /-c %~dp0 ^| find "bytes free"') do set FREE_SPACE=%%i
-set /a FREE_SPACE_GB=%FREE_SPACE:~0,-9%
-if %FREE_SPACE_GB% LSS 2 (
-    echo [⚠] Warning: Low disk space. Available: %FREE_SPACE_GB%GB, Recommended: 2GB+
-    set /p CONTINUE="Continue anyway? (y/N): "
-    if /i not "%CONTINUE%"=="y" exit /b 1
+for /f "tokens=3" %%i in ('dir /-c %~dp0 ^| find "bytes free"') do set "FREE_SPACE=%%i"
+set /a "FREE_SPACE_GB=!FREE_SPACE:~0,-9!"
+if !FREE_SPACE_GB! LSS %REQUIRED_SPACE% (
+    choice /m "[?] Low disk space (!FREE_SPACE_GB!GB). Continue"
+    if !errorlevel!==2 exit /b 1
 )
 
-echo [✓] Disk space check passed
+echo [+] Disk space check passed
 
 :: Create project structure
 echo.
 echo [SETUP] Creating project structure...
-if not exist "core" mkdir "core"
-if not exist "collectors" mkdir "collectors"
-if not exist "utils" mkdir "utils"
-if not exist "gui" mkdir "gui"
-if not exist "config" mkdir "config"
-if not exist "data" mkdir "data"
-if not exist "data\cache" mkdir "data\cache"
-if not exist "data\exports" mkdir "data\exports"
-if not exist "build" mkdir "build"
-if not exist "logs" mkdir "logs"
+set "DIRS=core collectors utils gui config data data\cache data\exports build logs tests"
+for %%d in (%DIRS%) do mkdir "%%d" 2>nul
 
-echo [✓] Project structure created
+echo [+] Project structure created
 
-:: Install/upgrade pip
-echo.
-echo [INSTALL] Upgrading pip to latest version...
+:: Setup pip and venv
+echo [*] Configuring Python environment...
 python -m pip install --upgrade pip --quiet --no-warn-script-location
-if %errorLevel% neq 0 (
-    echo [⚠] Warning: pip upgrade failed, continuing...
+if not exist "venv" (
+    python -m venv venv
+    call venv\Scripts\activate.bat
 )
 
-echo [✓] Pip upgraded
+:: Install dependencies
+echo [*] Installing packages...
+set "PACKAGES=aiohttp requests beautifulsoup4 sqlalchemy pandas openpyxl jinja2 validators dnspython python-whois cryptography textblob pyinstaller setuptools wheel"
+set "OPTIONAL=selenium nltk scikit-learn matplotlib tweepy"
 
-:: Install core dependencies
-echo.
-echo [INSTALL] Installing core dependencies...
-echo [INFO] This may take 5-10 minutes depending on your internet connection...
-
-:: Core packages for basic functionality
-set CORE_PACKAGES=aiohttp requests beautifulsoup4 sqlalchemy pandas openpyxl jinja2 validators dnspython python-whois cryptography textblob
-
-echo [INFO] Installing essential packages...
-for %%p in (%CORE_PACKAGES%) do (
-    echo   Installing %%p...
+:: Install main packages
+for %%p in (%PACKAGES%) do (
+    echo  Installing %%p...
     python -m pip install "%%p" --quiet --no-warn-script-location
-    if errorlevel 1 (
-        echo   [⚠] Warning: Failed to install %%p
+    if !errorlevel!==0 (
+        set /a "SUCCESS_COUNT+=1"
     ) else (
-        echo   [✓] %%p installed
+        echo  [!] Failed: %%p
+        set /a "ERROR_COUNT+=1"
     )
 )
 
-:: Build tools
-echo.
-echo [INSTALL] Installing build tools...
-python -m pip install pyinstaller setuptools wheel --quiet --no-warn-script-location
-echo [✓] Build tools installed
-
-:: Optional packages (best effort)
-echo.
-echo [INSTALL] Installing optional packages (best effort)...
-set OPTIONAL_PACKAGES=selenium nltk scikit-learn matplotlib tweepy
-
-for %%p in (%OPTIONAL_PACKAGES%) do (
-    echo   Trying to install %%p...
+:: Try optional packages
+echo [*] Installing optional packages...
+for %%p in (%OPTIONAL%) do (
     python -m pip install "%%p" --quiet --no-warn-script-location >nul 2>&1
-    if errorlevel 1 (
-        echo   [−] Skipped %%p (optional)
-    ) else (
-        echo   [✓] %%p installed
+    if !errorlevel!==0 (
+        echo  [+] Added: %%p
+        set /a "SUCCESS_COUNT+=1"
     )
 )
 
@@ -127,93 +108,35 @@ for %%p in (%OPTIONAL_PACKAGES%) do (
 echo.
 echo [CHECK] Verifying project files...
 
-set MISSING_FILES=0
+set "REQUIRED_FILES=main.py build_script.py"
+set "MISSING=0"
+for %%f in (%REQUIRED_FILES%) do if not exist "%%f" set /a "MISSING+=1"
 
-if not exist "main.py" (
-    echo [⚠] main.py not found - will be created
-    set MISSING_FILES=1
+if !MISSING! GTR 0 (
+    echo [!] Missing required files
+    echo [i] Please ensure all source files are present
+    pause & exit /b 1
 )
 
-if not exist "build_script.py" (
-    echo [⚠] build_script.py not found - will be created  
-    set MISSING_FILES=1
-)
-
-if %MISSING_FILES%==1 (
-    echo.
-    echo [INFO] Some essential files are missing.
-    echo [INFO] You need to have the following files in this directory:
-    echo   • main.py (main entry point)
-    echo   • build_script.py (enhanced build script)
-    echo   • Core modules in the 'core' folder
-    echo.
-    echo [ACTION] Please ensure you have all the Python files from the system.
-    echo [ACTION] Then run this script again to build the executable.
-    echo.
-    pause
-    exit /b 1
-)
-
-:: Run the enhanced build script
+:: Build process
 echo.
-echo [BUILD] Starting enhanced build process...
-echo [INFO] This will create a professional portable executable
-echo [INFO] Build time: 10-20 minutes depending on system performance
-echo.
+echo [*] Ready to build
+echo  Successful installations: !SUCCESS_COUNT!
+if !ERROR_COUNT! GTR 0 echo  Failed installations: !ERROR_COUNT!
 
-set /p CONFIRM="Start professional build? (y/N): "
-if /i not "%CONFIRM%"=="y" (
-    echo [INFO] Build cancelled by user
-    pause
-    exit /b 0
-)
+choice /m "[?] Start build process"
+if !errorlevel!==2 exit /b 0
 
-echo.
-echo [BUILD] Launching enhanced build script...
+echo [*] Building system...
 python build_script.py
-
-if %errorLevel% equ 0 (
-    echo.
-    echo ================================================================
-    echo                   BUILD COMPLETED SUCCESSFULLY!
-    echo ================================================================
-    echo.
-    echo [✓] Professional executable created
-    echo [✓] Portable package ready for distribution
-    echo [✓] All dependencies included
-    echo [✓] Documentation generated
-    echo.
-    echo NEXT STEPS:
-    echo 1. Check the "AdvancedOSINT_Professional" folder
-    echo 2. Test the executable: Launch_OSINT_System.bat
-    echo 3. Distribute the ZIP file to end users
-    echo.
-    echo FILES CREATED:
-    echo • AdvancedOSINT.exe (main executable)
-    echo • Launch_OSINT_System.bat (launcher)
-    echo • Complete documentation (README.md)
-    echo • Configuration files and examples
-    echo • Distribution ZIP package
-    echo.
+if !errorlevel!==0 (
+    echo [+] Build successful
+    echo [i] Check 'build' directory for output
 ) else (
-    echo.
-    echo ================================================================
-    echo                     BUILD FAILED
-    echo ================================================================
-    echo.
-    echo [✗] The build process encountered errors
-    echo [INFO] Common solutions:
-    echo   1. Run as administrator
-    echo   2. Disable antivirus temporarily
-    echo   3. Ensure stable internet connection
-    echo   4. Check available disk space
-    echo   5. Update Python to latest version
-    echo.
-    echo [INFO] Check the error messages above for specific issues
-    echo.
+    echo [!] Build failed
+    echo [i] Check logs for details
 )
 
-echo [INFO] Build process complete
-echo [INFO] Check logs above for any issues
 echo.
-pause
+echo Complete! Press any key to exit...
+pause >nul

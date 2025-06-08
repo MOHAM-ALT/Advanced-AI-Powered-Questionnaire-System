@@ -1,4 +1,781 @@
-verified.append({
+#!/usr/bin/env python3
+
+"""
+Advanced AI Intelligence Analyzer
+File Location: core/ai_analyzer.py
+AI-Powered Analysis and Intelligent Documentation System
+"""
+
+import re
+import json
+import asyncio
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
+from collections import Counter, defaultdict
+import logging
+from pathlib import Path
+import statistics
+
+# Text processing and AI libraries
+try:
+    from textblob import TextBlob
+except ImportError:
+    TextBlob = None
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class IntelligenceAnalysis:
+    """Comprehensive intelligence analysis result"""
+    investigation_id: str
+    target_identifier: str
+    analysis_timestamp: datetime
+    
+    # Business Analysis
+    business_type: str
+    business_confidence: float
+    industry_classification: str
+    company_size_estimate: str
+    target_audience_type: str  # B2B, B2C, Government, Mixed
+    
+    # Geographic Analysis
+    geographic_distribution: Dict[str, int]
+    primary_location: str
+    secondary_locations: List[str]
+    geographic_coverage: str  # Local, Regional, National, International
+    
+    # Personnel Analysis
+    decision_makers: List[Dict[str, Any]]
+    key_personnel: List[Dict[str, Any]]
+    organizational_structure: Dict[str, Any]
+    personnel_count_estimate: int
+    
+    # Contact Intelligence
+    contact_quality_scores: Dict[str, float]
+    verified_contacts: List[Dict[str, Any]]
+    contact_channels: List[str]
+    best_contact_methods: List[str]
+    
+    # Market Intelligence
+    competitive_landscape: Dict[str, Any]
+    market_position: str
+    growth_indicators: List[str]
+    business_opportunities: List[str]
+    
+    # Technology & Digital Presence
+    technology_stack: List[str]
+    digital_maturity: str
+    online_presence_strength: float
+    social_media_activity: Dict[str, Any]
+    
+    # Risk Assessment
+    data_quality_score: float
+    information_completeness: float
+    verification_status: Dict[str, str]
+    confidence_factors: List[str]
+    risk_indicators: List[str]
+    
+    # Insights and Recommendations
+    key_insights: List[str]
+    actionable_recommendations: List[str]
+    follow_up_opportunities: List[str]
+    intelligence_gaps: List[str]
+    
+    # Metadata
+    total_data_points: int
+    sources_analyzed: List[str]
+    analysis_methods_used: List[str]
+    processing_time_seconds: float
+
+class BusinessTypeClassifier:
+    """AI-powered business type classification"""
+    
+    def __init__(self):
+        self.business_patterns = self._initialize_business_patterns()
+        self.industry_keywords = self._initialize_industry_keywords()
+        
+    def _initialize_business_patterns(self) -> Dict[str, Dict[str, Any]]:
+        """Initialize business classification patterns"""
+        return {
+            'technology': {
+                'keywords': ['software', 'tech', 'IT', 'digital', 'app', 'platform', 'AI', 'machine learning', 'cloud', 'SaaS'],
+                'indicators': ['developer', 'engineer', 'CTO', 'technical', 'programming', 'coding', 'development'],
+                'business_models': ['B2B', 'B2C', 'SaaS', 'Platform'],
+                'confidence_weight': 1.0
+            },
+            'healthcare': {
+                'keywords': ['medical', 'health', 'clinic', 'hospital', 'pharmaceutical', 'biotech', 'healthcare'],
+                'indicators': ['doctor', 'nurse', 'medical director', 'physician', 'therapist', 'specialist'],
+                'business_models': ['B2C', 'B2B', 'Healthcare'],
+                'confidence_weight': 0.95
+            },
+            'finance': {
+                'keywords': ['bank', 'financial', 'investment', 'insurance', 'fintech', 'trading', 'capital'],
+                'indicators': ['CFO', 'financial advisor', 'analyst', 'banker', 'trader', 'accountant'],
+                'business_models': ['B2B', 'B2C', 'Financial Services'],
+                'confidence_weight': 0.9
+            },
+            'retail': {
+                'keywords': ['retail', 'store', 'shop', 'commerce', 'sales', 'merchandise', 'fashion'],
+                'indicators': ['sales manager', 'store manager', 'merchandiser', 'buyer', 'cashier'],
+                'business_models': ['B2C', 'E-commerce', 'Retail'],
+                'confidence_weight': 0.85
+            },
+            'hospitality': {
+                'keywords': ['hotel', 'restaurant', 'tourism', 'travel', 'hospitality', 'catering', 'resort'],
+                'indicators': ['chef', 'manager', 'receptionist', 'concierge', 'waiter', 'host'],
+                'business_models': ['B2C', 'Hospitality', 'Tourism'],
+                'confidence_weight': 0.9
+            },
+            'manufacturing': {
+                'keywords': ['manufacturing', 'factory', 'production', 'industrial', 'supply chain', 'logistics'],
+                'indicators': ['production manager', 'engineer', 'operator', 'supervisor', 'quality control'],
+                'business_models': ['B2B', 'Manufacturing', 'Industrial'],
+                'confidence_weight': 0.85
+            },
+            'consulting': {
+                'keywords': ['consulting', 'advisory', 'strategy', 'management', 'professional services'],
+                'indicators': ['consultant', 'advisor', 'partner', 'principal', 'analyst', 'strategist'],
+                'business_models': ['B2B', 'Professional Services', 'Consulting'],
+                'confidence_weight': 0.8
+            },
+            'education': {
+                'keywords': ['education', 'training', 'university', 'school', 'learning', 'academic'],
+                'indicators': ['teacher', 'professor', 'instructor', 'principal', 'dean', 'educator'],
+                'business_models': ['B2C', 'Education', 'Training'],
+                'confidence_weight': 0.85
+            }
+        }
+    
+    def _initialize_industry_keywords(self) -> Dict[str, List[str]]:
+        """Initialize industry-specific keywords"""
+        return {
+            'b2b_indicators': ['enterprise', 'business', 'corporate', 'professional', 'industrial', 'wholesale'],
+            'b2c_indicators': ['consumer', 'customer', 'personal', 'individual', 'retail', 'family'],
+            'startup_indicators': ['startup', 'founded', 'innovation', 'disruptive', 'emerging', 'new'],
+            'enterprise_indicators': ['enterprise', 'corporation', 'multinational', 'global', 'headquarters'],
+            'sme_indicators': ['small business', 'local', 'family business', 'independent', 'boutique']
+        }
+    
+    def classify_business_type(self, data_points: List[Dict[str, Any]]) -> Tuple[str, float, Dict[str, Any]]:
+        """Classify business type using AI analysis"""
+        # Combine all text data for analysis
+        combined_text = self._extract_text_content(data_points)
+        
+        # Score each business type
+        type_scores = {}
+        detailed_analysis = {}
+        
+        for business_type, patterns in self.business_patterns.items():
+            score = self._calculate_business_type_score(combined_text, patterns)
+            type_scores[business_type] = score
+            detailed_analysis[business_type] = {
+                'score': score,
+                'matched_keywords': self._find_matching_keywords(combined_text, patterns['keywords']),
+                'matched_indicators': self._find_matching_keywords(combined_text, patterns['indicators'])
+            }
+        
+        # Determine best match
+        best_type = max(type_scores, key=type_scores.get)
+        confidence = type_scores[best_type]
+        
+        # Apply confidence adjustments
+        confidence *= self.business_patterns[best_type]['confidence_weight']
+        
+        # Additional context analysis
+        context_analysis = self._analyze_business_context(combined_text, data_points)
+        
+        return best_type, confidence, {
+            'detailed_scores': detailed_analysis,
+            'context_analysis': context_analysis,
+            'confidence_factors': self._get_confidence_factors(best_type, combined_text)
+        }
+    
+    def _extract_text_content(self, data_points: List[Dict[str, Any]]) -> str:
+        """Extract all text content from data points"""
+        text_parts = []
+        
+        for data_point in data_points:
+            # Extract various text fields
+            text_fields = ['value', 'description', 'bio', 'title', 'snippet', 'content', 'name']
+            for field in text_fields:
+                if field in data_point and data_point[field]:
+                    text_parts.append(str(data_point[field]))
+            
+            # Extract from nested data
+            if 'context' in data_point and isinstance(data_point['context'], dict):
+                for key, value in data_point['context'].items():
+                    if isinstance(value, str):
+                        text_parts.append(value)
+        
+        return ' '.join(text_parts).lower()
+    
+    def _calculate_business_type_score(self, text: str, patterns: Dict[str, Any]) -> float:
+        """Calculate score for a specific business type"""
+        score = 0.0
+        total_weight = 0.0
+        
+        # Keyword matching
+        keyword_matches = sum(1 for keyword in patterns['keywords'] if keyword in text)
+        keyword_score = keyword_matches / len(patterns['keywords'])
+        score += keyword_score * 0.6
+        total_weight += 0.6
+        
+        # Indicator matching
+        indicator_matches = sum(1 for indicator in patterns['indicators'] if indicator in text)
+        indicator_score = indicator_matches / len(patterns['indicators'])
+        score += indicator_score * 0.4
+        total_weight += 0.4
+        
+        return score / total_weight if total_weight > 0 else 0.0
+    
+    def _find_matching_keywords(self, text: str, keywords: List[str]) -> List[str]:
+        """Find matching keywords in text"""
+        return [keyword for keyword in keywords if keyword in text]
+    
+    def _analyze_business_context(self, text: str, data_points: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze business context and characteristics"""
+        context = {
+            'target_audience': self._determine_target_audience(text),
+            'business_model': self._infer_business_model(text),
+            'company_size': self._estimate_company_size(text, data_points),
+            'maturity_level': self._assess_business_maturity(text),
+            'geographic_scope': self._determine_geographic_scope(text, data_points)
+        }
+        
+        return context
+    
+    def _determine_target_audience(self, text: str) -> str:
+        """Determine target audience (B2B, B2C, etc.)"""
+        b2b_score = sum(1 for indicator in self.industry_keywords['b2b_indicators'] if indicator in text)
+        b2c_score = sum(1 for indicator in self.industry_keywords['b2c_indicators'] if indicator in text)
+        
+        if b2b_score > b2c_score:
+            return 'B2B'
+        elif b2c_score > b2b_score:
+            return 'B2C'
+        else:
+            return 'Mixed'
+    
+    def _infer_business_model(self, text: str) -> str:
+        """Infer business model from text analysis"""
+        models = {
+            'saas': ['saas', 'software as a service', 'subscription', 'cloud platform'],
+            'marketplace': ['marketplace', 'platform', 'connect', 'network'],
+            'ecommerce': ['ecommerce', 'online store', 'shopping', 'cart'],
+            'consulting': ['consulting', 'advisory', 'services', 'expertise'],
+            'manufacturing': ['manufacturing', 'production', 'factory', 'assembly']
+        }
+        
+        model_scores = {}
+        for model, keywords in models.items():
+            score = sum(1 for keyword in keywords if keyword in text)
+            model_scores[model] = score
+        
+        return max(model_scores, key=model_scores.get) if model_scores else 'traditional'
+    
+    def _estimate_company_size(self, text: str, data_points: List[Dict[str, Any]]) -> str:
+        """Estimate company size"""
+        # Count employees found
+        employee_count = len([dp for dp in data_points if dp.get('data_type') == 'person_profile'])
+        
+        # Look for size indicators in text
+        if any(indicator in text for indicator in ['startup', 'small business', 'boutique']):
+            return 'small (1-50)'
+        elif any(indicator in text for indicator in ['medium', 'growing', 'expanding']):
+            return 'medium (51-500)'
+        elif any(indicator in text for indicator in ['enterprise', 'corporation', 'multinational']):
+            return 'large (500+)'
+        elif employee_count > 20:
+            return 'medium-large (100+)'
+        elif employee_count > 5:
+            return 'small-medium (10-100)'
+        else:
+            return 'small (1-50)'
+    
+    def _assess_business_maturity(self, text: str) -> str:
+        """Assess business maturity level"""
+        if any(indicator in text for indicator in self.industry_keywords['startup_indicators']):
+            return 'startup'
+        elif any(indicator in text for indicator in ['established', 'founded', 'years', 'experience']):
+            return 'established'
+        else:
+            return 'mature'
+    
+    def _determine_geographic_scope(self, text: str, data_points: List[Dict[str, Any]]) -> str:
+        """Determine geographic scope of business"""
+        locations = []
+        for dp in data_points:
+            if dp.get('geographic_location'):
+                locations.append(dp['geographic_location'])
+        
+        unique_locations = set(locations)
+        
+        if len(unique_locations) > 5:
+            return 'international'
+        elif len(unique_locations) > 2:
+            return 'regional'
+        else:
+            return 'local'
+    
+    def _get_confidence_factors(self, business_type: str, text: str) -> List[str]:
+        """Get factors that contribute to confidence in classification"""
+        factors = []
+        
+        patterns = self.business_patterns[business_type]
+        matched_keywords = self._find_matching_keywords(text, patterns['keywords'])
+        matched_indicators = self._find_matching_keywords(text, patterns['indicators'])
+        
+        if len(matched_keywords) > 3:
+            factors.append(f"Strong keyword alignment ({len(matched_keywords)} matches)")
+        
+        if len(matched_indicators) > 2:
+            factors.append(f"Clear industry indicators ({len(matched_indicators)} matches)")
+        
+        if business_type in ['technology', 'healthcare', 'finance']:
+            factors.append("High-confidence industry with clear patterns")
+        
+        return factors
+
+class PersonnelAnalyzer:
+    """Analyze personnel and organizational structure"""
+    
+    def __init__(self):
+        self.role_hierarchy = self._initialize_role_hierarchy()
+        self.decision_maker_patterns = self._initialize_decision_maker_patterns()
+    
+    def _initialize_role_hierarchy(self) -> Dict[str, int]:
+        """Initialize role hierarchy for importance scoring"""
+        return {
+            'ceo': 100, 'chief executive': 100, 'president': 95, 'founder': 90,
+            'cto': 85, 'cfo': 85, 'coo': 85, 'chief': 80,
+            'vice president': 75, 'vp': 75, 'director': 70, 'head of': 65,
+            'senior manager': 60, 'manager': 50, 'lead': 45, 'senior': 40,
+            'coordinator': 30, 'specialist': 25, 'analyst': 20, 'associate': 15
+        }
+    
+    def _initialize_decision_maker_patterns(self) -> Dict[str, List[str]]:
+        """Initialize decision maker identification patterns"""
+        return {
+            'executive': ['ceo', 'president', 'founder', 'chief executive', 'managing director'],
+            'senior_management': ['cto', 'cfo', 'coo', 'vp', 'vice president', 'director'],
+            'department_heads': ['head of', 'department manager', 'team lead', 'senior manager'],
+            'procurement': ['procurement', 'purchasing', 'buyer', 'vendor management'],
+            'hr_decision': ['hr manager', 'human resources', 'talent acquisition', 'recruiting'],
+            'technical_decision': ['cto', 'technical director', 'engineering manager', 'it director']
+        }
+    
+    def analyze_personnel_structure(self, personnel_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze organizational structure and identify key personnel"""
+        
+        if not personnel_data:
+            return {
+                'decision_makers': [],
+                'key_personnel': [],
+                'organizational_structure': {},
+                'personnel_insights': []
+            }
+        
+        # Classify and score personnel
+        classified_personnel = self._classify_personnel(personnel_data)
+        
+        # Identify decision makers
+        decision_makers = self._identify_decision_makers(classified_personnel)
+        
+        # Analyze organizational structure
+        org_structure = self._analyze_organizational_structure(classified_personnel)
+        
+        # Generate insights
+        insights = self._generate_personnel_insights(classified_personnel, decision_makers)
+        
+        return {
+            'decision_makers': decision_makers,
+            'key_personnel': classified_personnel[:10],  # Top 10
+            'organizational_structure': org_structure,
+            'personnel_insights': insights,
+            'total_personnel_found': len(personnel_data),
+            'decision_maker_count': len(decision_makers),
+            'department_coverage': len(org_structure.get('departments', {}))
+        }
+    
+    def _classify_personnel(self, personnel_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Classify and score personnel by importance"""
+        classified = []
+        
+        for person in personnel_data:
+            # Extract title and calculate importance
+            title = person.get('title', '').lower()
+            name = person.get('name', '')
+            
+            # Calculate importance score
+            importance_score = self._calculate_importance_score(title)
+            
+            # Determine department
+            department = self._determine_department(title)
+            
+            # Assess decision making power
+            decision_power = self._assess_decision_power(title)
+            
+            classified_person = {
+                'name': name,
+                'title': person.get('title', ''),
+                'normalized_title': title,
+                'importance_score': importance_score,
+                'department': department,
+                'decision_power': decision_power,
+                'contact_info': person.get('contact_info', {}),
+                'profile_url': person.get('profile_url', ''),
+                'location': person.get('location', ''),
+                'confidence': person.get('confidence', 0.5),
+                'original_data': person
+            }
+            
+            classified.append(classified_person)
+        
+        # Sort by importance score
+        return sorted(classified, key=lambda x: x['importance_score'], reverse=True)
+    
+    def _calculate_importance_score(self, title: str) -> int:
+        """Calculate importance score for a role"""
+        score = 10  # Base score
+        
+        # Check hierarchy
+        for role, role_score in self.role_hierarchy.items():
+            if role in title:
+                score = max(score, role_score)
+        
+        # Additional scoring factors
+        if 'senior' in title:
+            score += 10
+        if 'lead' in title:
+            score += 8
+        if 'principal' in title:
+            score += 12
+        
+        return score
+    
+    def _determine_department(self, title: str) -> str:
+        """Determine department from title"""
+        departments = {
+            'executive': ['ceo', 'president', 'founder', 'chief'],
+            'technology': ['cto', 'engineering', 'developer', 'technical', 'it', 'software'],
+            'finance': ['cfo', 'finance', 'accounting', 'controller', 'treasurer'],
+            'operations': ['coo', 'operations', 'production', 'manufacturing'],
+            'sales': ['sales', 'business development', 'account', 'revenue'],
+            'marketing': ['marketing', 'brand', 'advertising', 'communications'],
+            'hr': ['hr', 'human resources', 'talent', 'recruiting', 'people'],
+            'legal': ['legal', 'counsel', 'compliance', 'regulatory'],
+            'product': ['product', 'design', 'user experience', 'ux']
+        }
+        
+        for dept, keywords in departments.items():
+            if any(keyword in title for keyword in keywords):
+                return dept
+        
+        return 'other'
+    
+    def _assess_decision_power(self, title: str) -> str:
+        """Assess decision making power level"""
+        if any(pattern in title for pattern in self.decision_maker_patterns['executive']):
+            return 'high'
+        elif any(pattern in title for pattern in self.decision_maker_patterns['senior_management']):
+            return 'medium-high'
+        elif any(pattern in title for pattern in self.decision_maker_patterns['department_heads']):
+            return 'medium'
+        else:
+            return 'low'
+    
+    def _identify_decision_makers(self, classified_personnel: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Identify key decision makers"""
+        decision_makers = []
+        
+        for person in classified_personnel:
+            if person['decision_power'] in ['high', 'medium-high']:
+                decision_makers.append({
+                    'name': person['name'],
+                    'title': person['title'],
+                    'department': person['department'],
+                    'decision_power': person['decision_power'],
+                    'importance_score': person['importance_score'],
+                    'contact_info': person['contact_info'],
+                    'profile_url': person['profile_url'],
+                    'influence_areas': self._determine_influence_areas(person['title']),
+                    'contact_priority': self._calculate_contact_priority(person)
+                })
+        
+        return decision_makers[:15]  # Top 15 decision makers
+    
+    def _determine_influence_areas(self, title: str) -> List[str]:
+        """Determine areas of influence for a decision maker"""
+        influence_map = {
+            'ceo': ['strategic decisions', 'budget approval', 'partnerships', 'hiring'],
+            'cto': ['technology decisions', 'technical partnerships', 'system purchases'],
+            'cfo': ['financial decisions', 'budget allocation', 'vendor payments'],
+            'coo': ['operational decisions', 'process improvements', 'vendor management'],
+            'sales': ['sales tools', 'crm systems', 'sales partnerships'],
+            'marketing': ['marketing tools', 'advertising', 'brand partnerships'],
+            'hr': ['hr systems', 'recruiting tools', 'employee benefits']
+        }
+        
+        title_lower = title.lower()
+        areas = []
+        
+        for role, influences in influence_map.items():
+            if role in title_lower:
+                areas.extend(influences)
+        
+        return areas if areas else ['general business decisions']
+    
+    def _calculate_contact_priority(self, person: Dict[str, Any]) -> str:
+        """Calculate priority for contacting this person"""
+        score = person['importance_score']
+        
+        # Adjust based on contact availability
+        if person['contact_info'].get('email'):
+            score += 10
+        if person['contact_info'].get('phone'):
+            score += 5
+        
+        # Adjust based on decision power
+        power_bonus = {'high': 20, 'medium-high': 15, 'medium': 10, 'low': 0}
+        score += power_bonus.get(person['decision_power'], 0)
+        
+        if score >= 80:
+            return 'critical'
+        elif score >= 60:
+            return 'high'
+        elif score >= 40:
+            return 'medium'
+        else:
+            return 'low'
+    
+    def _analyze_organizational_structure(self, classified_personnel: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze organizational structure"""
+        departments = defaultdict(list)
+        hierarchy_levels = defaultdict(int)
+        
+        for person in classified_personnel:
+            departments[person['department']].append(person)
+            
+            # Count hierarchy levels
+            if person['importance_score'] >= 80:
+                hierarchy_levels['executive'] += 1
+            elif person['importance_score'] >= 60:
+                hierarchy_levels['senior_management'] += 1
+            elif person['importance_score'] >= 40:
+                hierarchy_levels['middle_management'] += 1
+            else:
+                hierarchy_levels['staff'] += 1
+        
+        return {
+            'departments': dict(departments),
+            'hierarchy_levels': dict(hierarchy_levels),
+            'largest_department': max(departments.items(), key=lambda x: len(x[1]))[0] if departments else None,
+            'management_ratio': (hierarchy_levels['executive'] + hierarchy_levels['senior_management']) / max(len(classified_personnel), 1)
+        }
+    
+    def _generate_personnel_insights(self, classified_personnel: List[Dict[str, Any]], decision_makers: List[Dict[str, Any]]) -> List[str]:
+        """Generate insights about personnel structure"""
+        insights = []
+        
+        if len(decision_makers) > 5:
+            insights.append(f"Well-represented leadership team with {len(decision_makers)} decision makers identified")
+        elif len(decision_makers) > 0:
+            insights.append(f"Limited leadership visibility with {len(decision_makers)} decision makers found")
+        
+        # Department analysis
+        departments = defaultdict(int)
+        for person in classified_personnel:
+            departments[person['department']] += 1
+        
+        if len(departments) > 4:
+            insights.append("Diverse organizational structure across multiple departments")
+        
+        # Contact availability
+        contactable = sum(1 for p in classified_personnel if p['contact_info'].get('email') or p['contact_info'].get('phone'))
+        if contactable > len(classified_personnel) * 0.5:
+            insights.append(f"Good contact availability - {contactable} out of {len(classified_personnel)} personnel have contact information")
+        
+        return insights
+
+class ContactQualityAnalyzer:
+    """Analyze and score contact information quality"""
+    
+    def __init__(self):
+        self.email_patterns = {
+            'business_domains': ['.com', '.org', '.net', '.sa', '.ae', '.gov'],
+            'personal_domains': ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
+            'suspicious_patterns': ['noreply', 'donotreply', 'test', 'temp'],
+            'executive_patterns': ['ceo@', 'president@', 'founder@', 'director@']
+        }
+        
+        self.phone_patterns = {
+            'saudi_mobile': re.compile(r'^\+?966[5][0-9]{8}$'),
+            'saudi_landline': re.compile(r'^\+?966[1-4][0-9]{7}$'),
+            'uae_mobile': re.compile(r'^\+?971[5][0-9]{8}$'),
+            'international': re.compile(r'^\+[1-9][0-9]{1,14}$')
+        }
+
+    def analyze_contact_quality(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze quality of contact information"""
+        if not contact_data:
+            return self._get_empty_analysis()
+
+        email_analysis = self._analyze_emails(contact_data)
+        phone_analysis = self._analyze_phones(contact_data)
+        overall_quality = self._calculate_overall_quality(email_analysis, phone_analysis)
+        
+        return {
+            'email_analysis': email_analysis,
+            'phone_analysis': phone_analysis,
+            'overall_quality_score': overall_quality,
+            'best_contact_methods': self._determine_best_contact_methods(email_analysis, phone_analysis),
+            'verified_contacts': self._identify_verified_contacts(contact_data),
+            'contact_recommendations': self._generate_contact_recommendations(email_analysis, phone_analysis)
+        }
+
+    def _get_empty_analysis(self) -> Dict[str, Any]:
+        """Return empty analysis structure when no data is provided"""
+        return {
+            'email_analysis': {'total_emails': 0, 'quality_score': 0, 'business_emails': 0},
+            'phone_analysis': {'total_phones': 0, 'quality_score': 0, 'mobile_count': 0},
+            'overall_quality_score': 0,
+            'best_contact_methods': ['general_inquiry'],
+            'verified_contacts': [],
+            'contact_recommendations': ['Additional research needed to find contact information']
+        }
+
+    def _analyze_emails(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze email quality"""
+        emails = [item for item in contact_data if item.get('type') == 'email']
+        
+        if not emails:
+            return {'total_emails': 0, 'quality_score': 0, 'business_emails': 0}
+        
+        counts = {
+            'business_emails': 0,
+            'personal_emails': 0,
+            'suspicious_emails': 0,
+            'executive_emails': 0
+        }
+        
+        for email_item in emails:
+            email = email_item.get('value', '').lower()
+            self._categorize_email(email, counts)
+        
+        quality_score = self._calculate_email_quality(counts, len(emails))
+        
+        return {
+            'total_emails': len(emails),
+            **counts,
+            'quality_score': quality_score
+        }
+
+    def _categorize_email(self, email: str, counts: Dict[str, int]) -> None:
+        """Categorize email and update counts"""
+        if any(domain in email for domain in self.email_patterns['personal_domains']):
+            counts['personal_emails'] += 1
+        else:
+            counts['business_emails'] += 1
+        
+        if any(pattern in email for pattern in self.email_patterns['suspicious_patterns']):
+            counts['suspicious_emails'] += 1
+        
+        if any(pattern in email for pattern in self.email_patterns['executive_patterns']):
+            counts['executive_emails'] += 1
+
+    def _calculate_email_quality(self, counts: Dict[str, int], total_emails: int) -> float:
+        """Calculate email quality score"""
+        quality_score = (
+            counts['business_emails'] * 0.8 + 
+            counts['executive_emails'] * 1.0 - 
+            counts['suspicious_emails'] * 0.5
+        ) / total_emails
+        return max(0, min(1, quality_score))
+    
+    def _analyze_phones(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze phone number quality"""
+        phones = [item for item in contact_data if item.get('type') == 'phone']
+        
+        if not phones:
+            return {'total_phones': 0, 'quality_score': 0, 'mobile_count': 0}
+        
+        mobile_count = 0
+        landline_count = 0
+        international_count = 0
+        valid_format_count = 0
+        
+        for phone_item in phones:
+            phone = phone_item.get('value', '').strip()
+            
+            # Clean phone number
+            cleaned_phone = re.sub(r'[^\d+]', '', phone)
+            
+            # Check patterns
+            if self.phone_patterns['saudi_mobile'].match(cleaned_phone):
+                mobile_count += 1
+                valid_format_count += 1
+            elif self.phone_patterns['saudi_landline'].match(cleaned_phone):
+                landline_count += 1
+                valid_format_count += 1
+            elif self.phone_patterns['uae_mobile'].match(cleaned_phone):
+                mobile_count += 1
+                valid_format_count += 1
+            elif self.phone_patterns['international'].match(cleaned_phone):
+                international_count += 1
+                valid_format_count += 1
+        
+        quality_score = valid_format_count / len(phones) if phones else 0
+        
+        return {
+            'total_phones': len(phones),
+            'mobile_count': mobile_count,
+            'landline_count': landline_count,
+            'international_count': international_count,
+            'valid_format_count': valid_format_count,
+            'quality_score': quality_score
+        }
+    
+    def _calculate_overall_quality(self, email_analysis: Dict, phone_analysis: Dict) -> float:
+        """Calculate overall contact quality score"""
+        email_weight = 0.6
+        phone_weight = 0.4
+        
+        email_score = email_analysis.get('quality_score', 0) * email_weight
+        phone_score = phone_analysis.get('quality_score', 0) * phone_weight
+        
+        return email_score + phone_score
+    
+    def _determine_best_contact_methods(self, email_analysis: Dict, phone_analysis: Dict) -> List[str]:
+        """Determine best contact methods"""
+        methods = []
+        
+        if email_analysis.get('business_emails', 0) > 0:
+            methods.append('business_email')
+        
+        if email_analysis.get('executive_emails', 0) > 0:
+            methods.append('executive_email')
+        
+        if phone_analysis.get('mobile_count', 0) > 0:
+            methods.append('mobile_phone')
+        
+        if phone_analysis.get('landline_count', 0) > 0:
+            methods.append('office_phone')
+        
+        return methods if methods else ['general_inquiry']
+    
+    def _identify_verified_contacts(self, contact_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Identify high-confidence verified contacts"""
+        verified = []
+        
+        for contact in contact_data:
+            confidence = contact.get('confidence', 0)
+            contact_type = contact.get('type', '')
+            
+            # High confidence threshold
+            if confidence >= 0.8:
+                verified.append({
                     'type': contact_type,
                     'value': contact.get('value', ''),
                     'confidence': confidence,
@@ -826,1130 +1603,4 @@ async def test_ai_analyzer():
 
 if __name__ == "__main__":
     # Run test
-    asyncio.run(test_ai_analyzer())class BusinessTypeClassifier:
-    """AI-powered business type classification"""
-    
-    def __init__(self):
-        self.business_patterns = self._initialize_business_patterns()
-        self.industry_keywords = self._initialize_industry_keywords()
-        
-    def _initialize_business_patterns(self) -> Dict[str, Dict[str, Any]]:
-        """Initialize business classification patterns"""
-        return {
-            'technology': {
-                'keywords': ['software', 'tech', 'IT', 'digital', 'app', 'platform', 'AI', 'machine learning', 'cloud', 'SaaS'],
-                'indicators': ['developer', 'engineer', 'CTO', 'technical', 'programming', 'coding', 'development'],
-                'business_models': ['B2B', 'B2C', 'SaaS', 'Platform'],
-                'confidence_weight': 1.0
-            },
-            'healthcare': {
-                'keywords': ['medical', 'health', 'clinic', 'hospital', 'pharmaceutical', 'biotech', 'healthcare'],
-                'indicators': ['doctor', 'nurse', 'medical director', 'physician', 'therapist', 'specialist'],
-                'business_models': ['B2C', 'B2B', 'Healthcare'],
-                'confidence_weight': 0.95
-            },
-            'finance': {
-                'keywords': ['bank', 'financial', 'investment', 'insurance', 'fintech', 'trading', 'capital'],
-                'indicators': ['CFO', 'financial advisor', 'analyst', 'banker', 'trader', 'accountant'],
-                'business_models': ['B2B', 'B2C', 'Financial Services'],
-                'confidence_weight': 0.9
-            },
-            'retail': {
-                'keywords': ['retail', 'store', 'shop', 'commerce', 'sales', 'merchandise', 'fashion'],
-                'indicators': ['sales manager', 'store manager', 'merchandiser', 'buyer', 'cashier'],
-                'business_models': ['B2C', 'E-commerce', 'Retail'],
-                'confidence_weight': 0.85
-            },
-            'hospitality': {
-                'keywords': ['hotel', 'restaurant', 'tourism', 'travel', 'hospitality', 'catering', 'resort'],
-                'indicators': ['chef', 'manager', 'receptionist', 'concierge', 'waiter', 'host'],
-                'business_models': ['B2C', 'Hospitality', 'Tourism'],
-                'confidence_weight': 0.9
-            },
-            'manufacturing': {
-                'keywords': ['manufacturing', 'factory', 'production', 'industrial', 'supply chain', 'logistics'],
-                'indicators': ['production manager', 'engineer', 'operator', 'supervisor', 'quality control'],
-                'business_models': ['B2B', 'Manufacturing', 'Industrial'],
-                'confidence_weight': 0.85
-            },
-            'consulting': {
-                'keywords': ['consulting', 'advisory', 'strategy', 'management', 'professional services'],
-                'indicators': ['consultant', 'advisor', 'partner', 'principal', 'analyst', 'strategist'],
-                'business_models': ['B2B', 'Professional Services', 'Consulting'],
-                'confidence_weight': 0.8
-            },
-            'education': {
-                'keywords': ['education', 'training', 'university', 'school', 'learning', 'academic'],
-                'indicators': ['teacher', 'professor', 'instructor', 'principal', 'dean', 'educator'],
-                'business_models': ['B2C', 'Education', 'Training'],
-                'confidence_weight': 0.85
-            }
-        }
-    
-    def _initialize_industry_keywords(self) -> Dict[str, List[str]]:
-        """Initialize industry-specific keywords"""
-        return {
-            'b2b_indicators': ['enterprise', 'business', 'corporate', 'professional', 'industrial', 'wholesale'],
-            'b2c_indicators': ['consumer', 'customer', 'personal', 'individual', 'retail', 'family'],
-            'startup_indicators': ['startup', 'founded', 'innovation', 'disruptive', 'emerging', 'new'],
-            'enterprise_indicators': ['enterprise', 'corporation', 'multinational', 'global', 'headquarters'],
-            'sme_indicators': ['small business', 'local', 'family business', 'independent', 'boutique']
-        }
-    
-    def classify_business_type(self, data_points: List[Dict[str, Any]]) -> Tuple[str, float, Dict[str, Any]]:
-        """Classify business type using AI analysis"""
-        # Combine all text data for analysis
-        combined_text = self._extract_text_content(data_points)
-        
-        # Score each business type
-        type_scores = {}
-        detailed_analysis = {}
-        
-        for business_type, patterns in self.business_patterns.items():
-            score = self._calculate_business_type_score(combined_text, patterns)
-            type_scores[business_type] = score
-            detailed_analysis[business_type] = {
-                'score': score,
-                'matched_keywords': self._find_matching_keywords(combined_text, patterns['keywords']),
-                'matched_indicators': self._find_matching_keywords(combined_text, patterns['indicators'])
-            }
-        
-        # Determine best match
-        best_type = max(type_scores, key=type_scores.get)
-        confidence = type_scores[best_type]
-        
-        # Apply confidence adjustments
-        confidence *= self.business_patterns[best_type]['confidence_weight']
-        
-        # Additional context analysis
-        context_analysis = self._analyze_business_context(combined_text, data_points)
-        
-        return best_type, confidence, {
-            'detailed_scores': detailed_analysis,
-            'context_analysis': context_analysis,
-            'confidence_factors': self._get_confidence_factors(best_type, combined_text)
-        }
-    
-    def _extract_text_content(self, data_points: List[Dict[str, Any]]) -> str:
-        """Extract all text content from data points"""
-        text_parts = []
-        
-        for data_point in data_points:
-            # Extract various text fields
-            text_fields = ['value', 'description', 'bio', 'title', 'snippet', 'content', 'name']
-            for field in text_fields:
-                if field in data_point and data_point[field]:
-                    text_parts.append(str(data_point[field]))
-            
-            # Extract from nested data
-            if 'context' in data_point and isinstance(data_point['context'], dict):
-                for key, value in data_point['context'].items():
-                    if isinstance(value, str):
-                        text_parts.append(value)
-        
-        return ' '.join(text_parts).lower()
-    
-    def _calculate_business_type_score(self, text: str, patterns: Dict[str, Any]) -> float:
-        """Calculate score for a specific business type"""
-        score = 0.0
-        total_weight = 0.0
-        
-        # Keyword matching
-        keyword_matches = sum(1 for keyword in patterns['keywords'] if keyword in text)
-        keyword_score = keyword_matches / len(patterns['keywords'])
-        score += keyword_score * 0.6
-        total_weight += 0.6
-        
-        # Indicator matching
-        indicator_matches = sum(1 for indicator in patterns['indicators'] if indicator in text)
-        indicator_score = indicator_matches / len(patterns['indicators'])
-        score += indicator_score * 0.4
-        total_weight += 0.4
-        
-        return score / total_weight if total_weight > 0 else 0.0
-    
-    def _find_matching_keywords(self, text: str, keywords: List[str]) -> List[str]:
-        """Find matching keywords in text"""
-        return [keyword for keyword in keywords if keyword in text]
-    
-    def _analyze_business_context(self, text: str, data_points: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze business context and characteristics"""
-        context = {
-            'target_audience': self._determine_target_audience(text),
-            'business_model': self._infer_business_model(text),
-            'company_size': self._estimate_company_size(text, data_points),
-            'maturity_level': self._assess_business_maturity(text),
-            'geographic_scope': self._determine_geographic_scope(text, data_points)
-        }
-        
-        return context
-    
-    def _determine_target_audience(self, text: str) -> str:
-        """Determine target audience (B2B, B2C, etc.)"""
-        b2b_score = sum(1 for indicator in self.industry_keywords['b2b_indicators'] if indicator in text)
-        b2c_score = sum(1 for indicator in self.industry_keywords['b2c_indicators'] if indicator in text)
-        
-        if b2b_score > b2c_score:
-            return 'B2B'
-        elif b2c_score > b2b_score:
-            return 'B2C'
-        else:
-            return 'Mixed'
-    
-    def _infer_business_model(self, text: str) -> str:
-        """Infer business model from text analysis"""
-        models = {
-            'saas': ['saas', 'software as a service', 'subscription', 'cloud platform'],
-            'marketplace': ['marketplace', 'platform', 'connect', 'network'],
-            'ecommerce': ['ecommerce', 'online store', 'shopping', 'cart'],
-            'consulting': ['consulting', 'advisory', 'services', 'expertise'],
-            'manufacturing': ['manufacturing', 'production', 'factory', 'assembly']
-        }
-        
-        model_scores = {}
-        for model, keywords in models.items():
-            score = sum(1 for keyword in keywords if keyword in text)
-            model_scores[model] = score
-        
-        return max(model_scores, key=model_scores.get) if model_scores else 'traditional'
-    
-    def _estimate_company_size(self, text: str, data_points: List[Dict[str, Any]]) -> str:
-        """Estimate company size"""
-        # Count employees found
-        employee_count = len([dp for dp in data_points if dp.get('data_type') == 'person_profile'])
-        
-        # Look for size indicators in text
-        if any(indicator in text for indicator in ['startup', 'small business', 'boutique']):
-            return 'small (1-50)'
-        elif any(indicator in text for indicator in ['medium', 'growing', 'expanding']):
-            return 'medium (51-500)'
-        elif any(indicator in text for indicator in ['enterprise', 'corporation', 'multinational']):
-            return 'large (500+)'
-        elif employee_count > 20:
-            return 'medium-large (100+)'
-        elif employee_count > 5:
-            return 'small-medium (10-100)'
-        else:
-            return 'small (1-50)'
-    
-    def _assess_business_maturity(self, text: str) -> str:
-        """Assess business maturity level"""
-        if any(indicator in text for indicator in self.industry_keywords['startup_indicators']):
-            return 'startup'
-        elif any(indicator in text for indicator in ['established', 'founded', 'years', 'experience']):
-            return 'established'
-        else:
-            return 'mature'
-    
-    def _determine_geographic_scope(self, text: str, data_points: List[Dict[str, Any]]) -> str:
-        """Determine geographic scope of business"""
-        locations = []
-        for dp in data_points:
-            if dp.get('geographic_location'):
-                locations.append(dp['geographic_location'])
-        
-        unique_locations = set(locations)
-        
-        if len(unique_locations) > 5:
-            return 'international'
-        elif len(unique_locations) > 2:
-            return 'regional'
-        else:
-            return 'local'
-    
-    def _get_confidence_factors(self, business_type: str, text: str) -> List[str]:
-        """Get factors that contribute to confidence in classification"""
-        factors = []
-        
-        patterns = self.business_patterns[business_type]
-        matched_keywords = self._find_matching_keywords(text, patterns['keywords'])
-        matched_indicators = self._find_matching_keywords(text, patterns['indicators'])
-        
-        if len(matched_keywords) > 3:
-            factors.append(f"Strong keyword alignment ({len(matched_keywords)} matches)")
-        
-        if len(matched_indicators) > 2:
-            factors.append(f"Clear industry indicators ({len(matched_indicators)} matches)")
-        
-        if business_type in ['technology', 'healthcare', 'finance']:
-            factors.append("High-confidence industry with clear patterns")
-        
-        return factors
-
-class PersonnelAnalyzer:
-    """Analyze personnel and organizational structure"""
-    
-    def __init__(self):
-        self.role_hierarchy = self._initialize_role_hierarchy()
-        self.decision_maker_patterns = self._initialize_decision_maker_patterns()
-    
-    def _initialize_role_hierarchy(self) -> Dict[str, int]:
-        """Initialize role hierarchy for importance scoring"""
-        return {
-            'ceo': 100, 'chief executive': 100, 'president': 95, 'founder': 90,
-            'cto': 85, 'cfo': 85, 'coo': 85, 'chief': 80,
-            'vice president': 75, 'vp': 75, 'director': 70, 'head of': 65,
-            'senior manager': 60, 'manager': 50, 'lead': 45, 'senior': 40,
-            'coordinator': 30, 'specialist': 25, 'analyst': 20, 'associate': 15
-        }
-    
-    def _initialize_decision_maker_patterns(self) -> Dict[str, List[str]]:
-        """Initialize decision maker identification patterns"""
-        return {
-            'executive': ['ceo', 'president', 'founder', 'chief executive', 'managing director'],
-            'senior_management': ['cto', 'cfo', 'coo', 'vp', 'vice president', 'director'],
-            'department_heads': ['head of', 'department manager', 'team lead', 'senior manager'],
-            'procurement': ['procurement', 'purchasing', 'buyer', 'vendor management'],
-            'hr_decision': ['hr manager', 'human resources', 'talent acquisition', 'recruiting'],
-            'technical_decision': ['cto', 'technical director', 'engineering manager', 'it director']
-        }
-    
-    def analyze_personnel_structure(self, personnel_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze organizational structure and identify key personnel"""
-        
-        if not personnel_data:
-            return {
-                'decision_makers': [],
-                'key_personnel': [],
-                'organizational_structure': {},
-                'personnel_insights': []
-            }
-        
-        # Classify and score personnel
-        classified_personnel = self._classify_personnel(personnel_data)
-        
-        # Identify decision makers
-        decision_makers = self._identify_decision_makers(classified_personnel)
-        
-        # Analyze organizational structure
-        org_structure = self._analyze_organizational_structure(classified_personnel)
-        
-        # Generate insights
-        insights = self._generate_personnel_insights(classified_personnel, decision_makers)
-        
-        return {
-            'decision_makers': decision_makers,
-            'key_personnel': classified_personnel[:10],  # Top 10
-            'organizational_structure': org_structure,
-            'personnel_insights': insights,
-            'total_personnel_found': len(personnel_data),
-            'decision_maker_count': len(decision_makers),
-            'department_coverage': len(org_structure.get('departments', {}))
-        }
-    
-    def _classify_personnel(self, personnel_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Classify and score personnel by importance"""
-        classified = []
-        
-        for person in personnel_data:
-            # Extract title and calculate importance
-            title = person.get('title', '').lower()
-            name = person.get('name', '')
-            
-            # Calculate importance score
-            importance_score = self._calculate_importance_score(title)
-            
-            # Determine department
-            department = self._determine_department(title)
-            
-            # Assess decision making power
-            decision_power = self._assess_decision_power(title)
-            
-            classified_person = {
-                'name': name,
-                'title': person.get('title', ''),
-                'normalized_title': title,
-                'importance_score': importance_score,
-                'department': department,
-                'decision_power': decision_power,
-                'contact_info': person.get('contact_info', {}),
-                'profile_url': person.get('profile_url', ''),
-                'location': person.get('location', ''),
-                'confidence': person.get('confidence', 0.5),
-                'original_data': person
-            }
-            
-            classified.append(classified_person)
-        
-        # Sort by importance score
-        return sorted(classified, key=lambda x: x['importance_score'], reverse=True)
-    
-    def _calculate_importance_score(self, title: str) -> int:
-        """Calculate importance score for a role"""
-        score = 10  # Base score
-        
-        # Check hierarchy
-        for role, role_score in self.role_hierarchy.items():
-            if role in title:
-                score = max(score, role_score)
-        
-        # Additional scoring factors
-        if 'senior' in title:
-            score += 10
-        if 'lead' in title:
-            score += 8
-        if 'principal' in title:
-            score += 12
-        
-        return score
-    
-    def _determine_department(self, title: str) -> str:
-        """Determine department from title"""
-        departments = {
-            'executive': ['ceo', 'president', 'founder', 'chief'],
-            'technology': ['cto', 'engineering', 'developer', 'technical', 'it', 'software'],
-            'finance': ['cfo', 'finance', 'accounting', 'controller', 'treasurer'],
-            'operations': ['coo', 'operations', 'production', 'manufacturing'],
-            'sales': ['sales', 'business development', 'account', 'revenue'],
-            'marketing': ['marketing', 'brand', 'advertising', 'communications'],
-            'hr': ['hr', 'human resources', 'talent', 'recruiting', 'people'],
-            'legal': ['legal', 'counsel', 'compliance', 'regulatory'],
-            'product': ['product', 'design', 'user experience', 'ux']
-        }
-        
-        for dept, keywords in departments.items():
-            if any(keyword in title for keyword in keywords):
-                return dept
-        
-        return 'other'
-    
-    def _assess_decision_power(self, title: str) -> str:
-        """Assess decision making power level"""
-        if any(pattern in title for pattern in self.decision_maker_patterns['executive']):
-            return 'high'
-        elif any(pattern in title for pattern in self.decision_maker_patterns['senior_management']):
-            return 'medium-high'
-        elif any(pattern in title for pattern in self.decision_maker_patterns['department_heads']):
-            return 'medium'
-        else:
-            return 'low'
-    
-    def _identify_decision_makers(self, classified_personnel: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Identify key decision makers"""
-        decision_makers = []
-        
-        for person in classified_personnel:
-            if person['decision_power'] in ['high', 'medium-high']:
-                decision_makers.append({
-                    'name': person['name'],
-                    'title': person['title'],
-                    'department': person['department'],
-                    'decision_power': person['decision_power'],
-                    'importance_score': person['importance_score'],
-                    'contact_info': person['contact_info'],
-                    'profile_url': person['profile_url'],
-                    'influence_areas': self._determine_influence_areas(person['title']),
-                    'contact_priority': self._calculate_contact_priority(person)
-                })
-        
-        return decision_makers[:15]  # Top 15 decision makers
-    
-    def _determine_influence_areas(self, title: str) -> List[str]:
-        """Determine areas of influence for a decision maker"""
-        influence_map = {
-            'ceo': ['strategic decisions', 'budget approval', 'partnerships', 'hiring'],
-            'cto': ['technology decisions', 'technical partnerships', 'system purchases'],
-            'cfo': ['financial decisions', 'budget allocation', 'vendor payments'],
-            'coo': ['operational decisions', 'process improvements', 'vendor management'],
-            'sales': ['sales tools', 'crm systems', 'sales partnerships'],
-            'marketing': ['marketing tools', 'advertising', 'brand partnerships'],
-            'hr': ['hr systems', 'recruiting tools', 'employee benefits']
-        }
-        
-        title_lower = title.lower()
-        areas = []
-        
-        for role, influences in influence_map.items():
-            if role in title_lower:
-                areas.extend(influences)
-        
-        return areas if areas else ['general business decisions']
-    
-    def _calculate_contact_priority(self, person: Dict[str, Any]) -> str:
-        """Calculate priority for contacting this person"""
-        score = person['importance_score']
-        
-        # Adjust based on contact availability
-        if person['contact_info'].get('email'):
-            score += 10
-        if person['contact_info'].get('phone'):
-            score += 5
-        
-        # Adjust based on decision power
-        power_bonus = {'high': 20, 'medium-high': 15, 'medium': 10, 'low': 0}
-        score += power_bonus.get(person['decision_power'], 0)
-        
-        if score >= 80:
-            return 'critical'
-        elif score >= 60:
-            return 'high'
-        elif score >= 40:
-            return 'medium'
-        else:
-            return 'low'
-    
-    def _analyze_organizational_structure(self, classified_personnel: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze organizational structure"""
-        departments = defaultdict(list)
-        hierarchy_levels = defaultdict(int)
-        
-        for person in classified_personnel:
-            departments[person['department']].append(person)
-            
-            # Count hierarchy levels
-            if person['importance_score'] >= 80:
-                hierarchy_levels['executive'] += 1
-            elif person['importance_score'] >= 60:
-                hierarchy_levels['senior_management'] += 1
-            elif person['importance_score'] >= 40:
-                hierarchy_levels['middle_management'] += 1
-            else:
-                hierarchy_levels['staff'] += 1
-        
-        return {
-            'departments': dict(departments),
-            'hierarchy_levels': dict(hierarchy_levels),
-            'largest_department': max(departments.items(), key=lambda x: len(x[1]))[0] if departments else None,
-            'management_ratio': (hierarchy_levels['executive'] + hierarchy_levels['senior_management']) / max(len(classified_personnel), 1)
-        }
-    
-    def _generate_personnel_insights(self, classified_personnel: List[Dict[str, Any]], decision_makers: List[Dict[str, Any]]) -> List[str]:
-        """Generate insights about personnel structure"""
-        insights = []
-        
-        if len(decision_makers) > 5:
-            insights.append(f"Well-represented leadership team with {len(decision_makers)} decision makers identified")
-        elif len(decision_makers) > 0:
-            insights.append(f"Limited leadership visibility with {len(decision_makers)} decision makers found")
-        
-        # Department analysis
-        departments = defaultdict(int)
-        for person in classified_personnel:
-            departments[person['department']] += 1
-        
-        if len(departments) > 4:
-            insights.append("Diverse organizational structure across multiple departments")
-        
-        # Contact availability
-        contactable = sum(1 for p in classified_personnel if p['contact_info'].get('email') or p['contact_info'].get('phone'))
-        if contactable > len(classified_personnel) * 0.5:
-            insights.append(f"Good contact availability - {contactable} out of {len(classified_personnel)} personnel have contact information")
-        
-        return insights
-
-class ContactQualityAnalyzer:
-    """Analyze and score contact information quality"""
-    
-    def __init__(self):
-        self.email_patterns = self._initialize_email_patterns()
-        self.phone_patterns = self._initialize_phone_patterns()
-    
-    def _initialize_email_patterns(self) -> Dict[str, Any]:
-        """Initialize email quality patterns"""
-        return {
-            'business_domains': ['.com', '.org', '.net', '.sa', '.ae', '.gov'],
-            'personal_domains': ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-            'suspicious_patterns': ['noreply', 'donotreply', 'test', 'temp'],
-            'executive_patterns': ['ceo@', 'president@', 'founder@', 'director@']
-        }
-    
-    def _initialize_phone_patterns(self) -> Dict[str, Any]:
-        """Initialize phone number quality patterns"""
-        return {
-            'saudi_mobile': re.compile(r'^\+?966[5][0-9]{8}#!/usr/bin/env python3
-"""
-Advanced AI Intelligence Analyzer
-File Location: core/ai_analyzer.py
-AI-Powered Analysis and Intelligent Documentation System
-"""
-
-import re
-import json
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-from collections import Counter, defaultdict
-import logging
-from pathlib import Path
-import statistics
-
-# Text processing and AI libraries
-try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class IntelligenceAnalysis:
-    """Comprehensive intelligence analysis result"""
-    investigation_id: str
-    target_identifier: str
-    analysis_timestamp: datetime
-    
-    # Business Analysis
-    business_type: str
-    business_confidence: float
-    industry_classification: str
-    company_size_estimate: str
-    target_audience_type: str  # B2B, B2C, Government, Mixed
-    
-    # Geographic Analysis
-    geographic_distribution: Dict[str, int]
-    primary_location: str
-    secondary_locations: List[str]
-    geographic_coverage: str  # Local, Regional, National, International
-    
-    # Personnel Analysis
-    decision_makers: List[Dict[str, Any]]
-    key_personnel: List[Dict[str, Any]]
-    organizational_structure: Dict[str, Any]
-    personnel_count_estimate: int
-    
-    # Contact Intelligence
-    contact_quality_scores: Dict[str, float]
-    verified_contacts: List[Dict[str, Any]]
-    contact_channels: List[str]
-    best_contact_methods: List[str]
-    
-    # Market Intelligence
-    competitive_landscape: Dict[str, Any]
-    market_position: str
-    growth_indicators: List[str]
-    business_opportunities: List[str]
-    
-    # Technology & Digital Presence
-    technology_stack: List[str]
-    digital_maturity: str
-    online_presence_strength: float
-    social_media_activity: Dict[str, Any]
-    
-    # Risk Assessment
-    data_quality_score: float
-    information_completeness: float
-    verification_status: Dict[str, str]
-    confidence_factors: List[str]
-    risk_indicators: List[str]
-    
-    # Insights and Recommendations
-    key_insights: List[str]
-    actionable_recommendations: List[str]
-    follow_up_opportunities: List[str]
-    intelligence_gaps: List[str]
-    
-    # Metadata
-    total_data_points: int
-    sources_analyzed: List[str]
-    analysis_methods_used: List[str]
-    processing_time_seconds: float
-
-class BusinessTypeClassifier:
-    """AI-),
-            'saudi_landline': re.compile(r'^\+?966[1-4][0-9]{7}#!/usr/bin/env python3
-"""
-Advanced AI Intelligence Analyzer
-File Location: core/ai_analyzer.py
-AI-Powered Analysis and Intelligent Documentation System
-"""
-
-import re
-import json
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-from collections import Counter, defaultdict
-import logging
-from pathlib import Path
-import statistics
-
-# Text processing and AI libraries
-try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class IntelligenceAnalysis:
-    """Comprehensive intelligence analysis result"""
-    investigation_id: str
-    target_identifier: str
-    analysis_timestamp: datetime
-    
-    # Business Analysis
-    business_type: str
-    business_confidence: float
-    industry_classification: str
-    company_size_estimate: str
-    target_audience_type: str  # B2B, B2C, Government, Mixed
-    
-    # Geographic Analysis
-    geographic_distribution: Dict[str, int]
-    primary_location: str
-    secondary_locations: List[str]
-    geographic_coverage: str  # Local, Regional, National, International
-    
-    # Personnel Analysis
-    decision_makers: List[Dict[str, Any]]
-    key_personnel: List[Dict[str, Any]]
-    organizational_structure: Dict[str, Any]
-    personnel_count_estimate: int
-    
-    # Contact Intelligence
-    contact_quality_scores: Dict[str, float]
-    verified_contacts: List[Dict[str, Any]]
-    contact_channels: List[str]
-    best_contact_methods: List[str]
-    
-    # Market Intelligence
-    competitive_landscape: Dict[str, Any]
-    market_position: str
-    growth_indicators: List[str]
-    business_opportunities: List[str]
-    
-    # Technology & Digital Presence
-    technology_stack: List[str]
-    digital_maturity: str
-    online_presence_strength: float
-    social_media_activity: Dict[str, Any]
-    
-    # Risk Assessment
-    data_quality_score: float
-    information_completeness: float
-    verification_status: Dict[str, str]
-    confidence_factors: List[str]
-    risk_indicators: List[str]
-    
-    # Insights and Recommendations
-    key_insights: List[str]
-    actionable_recommendations: List[str]
-    follow_up_opportunities: List[str]
-    intelligence_gaps: List[str]
-    
-    # Metadata
-    total_data_points: int
-    sources_analyzed: List[str]
-    analysis_methods_used: List[str]
-    processing_time_seconds: float
-
-class BusinessTypeClassifier:
-    """AI-),
-            'uae_mobile': re.compile(r'^\+?971[5][0-9]{8}#!/usr/bin/env python3
-"""
-Advanced AI Intelligence Analyzer
-File Location: core/ai_analyzer.py
-AI-Powered Analysis and Intelligent Documentation System
-"""
-
-import re
-import json
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-from collections import Counter, defaultdict
-import logging
-from pathlib import Path
-import statistics
-
-# Text processing and AI libraries
-try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class IntelligenceAnalysis:
-    """Comprehensive intelligence analysis result"""
-    investigation_id: str
-    target_identifier: str
-    analysis_timestamp: datetime
-    
-    # Business Analysis
-    business_type: str
-    business_confidence: float
-    industry_classification: str
-    company_size_estimate: str
-    target_audience_type: str  # B2B, B2C, Government, Mixed
-    
-    # Geographic Analysis
-    geographic_distribution: Dict[str, int]
-    primary_location: str
-    secondary_locations: List[str]
-    geographic_coverage: str  # Local, Regional, National, International
-    
-    # Personnel Analysis
-    decision_makers: List[Dict[str, Any]]
-    key_personnel: List[Dict[str, Any]]
-    organizational_structure: Dict[str, Any]
-    personnel_count_estimate: int
-    
-    # Contact Intelligence
-    contact_quality_scores: Dict[str, float]
-    verified_contacts: List[Dict[str, Any]]
-    contact_channels: List[str]
-    best_contact_methods: List[str]
-    
-    # Market Intelligence
-    competitive_landscape: Dict[str, Any]
-    market_position: str
-    growth_indicators: List[str]
-    business_opportunities: List[str]
-    
-    # Technology & Digital Presence
-    technology_stack: List[str]
-    digital_maturity: str
-    online_presence_strength: float
-    social_media_activity: Dict[str, Any]
-    
-    # Risk Assessment
-    data_quality_score: float
-    information_completeness: float
-    verification_status: Dict[str, str]
-    confidence_factors: List[str]
-    risk_indicators: List[str]
-    
-    # Insights and Recommendations
-    key_insights: List[str]
-    actionable_recommendations: List[str]
-    follow_up_opportunities: List[str]
-    intelligence_gaps: List[str]
-    
-    # Metadata
-    total_data_points: int
-    sources_analyzed: List[str]
-    analysis_methods_used: List[str]
-    processing_time_seconds: float
-
-class BusinessTypeClassifier:
-    """AI-),
-            'international': re.compile(r'^\+[1-9][0-9]{1,14}#!/usr/bin/env python3
-"""
-Advanced AI Intelligence Analyzer
-File Location: core/ai_analyzer.py
-AI-Powered Analysis and Intelligent Documentation System
-"""
-
-import re
-import json
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-from collections import Counter, defaultdict
-import logging
-from pathlib import Path
-import statistics
-
-# Text processing and AI libraries
-try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class IntelligenceAnalysis:
-    """Comprehensive intelligence analysis result"""
-    investigation_id: str
-    target_identifier: str
-    analysis_timestamp: datetime
-    
-    # Business Analysis
-    business_type: str
-    business_confidence: float
-    industry_classification: str
-    company_size_estimate: str
-    target_audience_type: str  # B2B, B2C, Government, Mixed
-    
-    # Geographic Analysis
-    geographic_distribution: Dict[str, int]
-    primary_location: str
-    secondary_locations: List[str]
-    geographic_coverage: str  # Local, Regional, National, International
-    
-    # Personnel Analysis
-    decision_makers: List[Dict[str, Any]]
-    key_personnel: List[Dict[str, Any]]
-    organizational_structure: Dict[str, Any]
-    personnel_count_estimate: int
-    
-    # Contact Intelligence
-    contact_quality_scores: Dict[str, float]
-    verified_contacts: List[Dict[str, Any]]
-    contact_channels: List[str]
-    best_contact_methods: List[str]
-    
-    # Market Intelligence
-    competitive_landscape: Dict[str, Any]
-    market_position: str
-    growth_indicators: List[str]
-    business_opportunities: List[str]
-    
-    # Technology & Digital Presence
-    technology_stack: List[str]
-    digital_maturity: str
-    online_presence_strength: float
-    social_media_activity: Dict[str, Any]
-    
-    # Risk Assessment
-    data_quality_score: float
-    information_completeness: float
-    verification_status: Dict[str, str]
-    confidence_factors: List[str]
-    risk_indicators: List[str]
-    
-    # Insights and Recommendations
-    key_insights: List[str]
-    actionable_recommendations: List[str]
-    follow_up_opportunities: List[str]
-    intelligence_gaps: List[str]
-    
-    # Metadata
-    total_data_points: int
-    sources_analyzed: List[str]
-    analysis_methods_used: List[str]
-    processing_time_seconds: float
-
-class BusinessTypeClassifier:
-    """AI-)
-        }
-    
-    def analyze_contact_quality(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze quality of contact information"""
-        
-        email_analysis = self._analyze_emails(contact_data)
-        phone_analysis = self._analyze_phones(contact_data)
-        overall_quality = self._calculate_overall_quality(email_analysis, phone_analysis)
-        
-        return {
-            'email_analysis': email_analysis,
-            'phone_analysis': phone_analysis,
-            'overall_quality_score': overall_quality,
-            'best_contact_methods': self._determine_best_contact_methods(email_analysis, phone_analysis),
-            'verified_contacts': self._identify_verified_contacts(contact_data),
-            'contact_recommendations': self._generate_contact_recommendations(email_analysis, phone_analysis)
-        }
-    
-    def _analyze_emails(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze email quality"""
-        emails = [item for item in contact_data if item.get('type') == 'email']
-        
-        if not emails:
-            return {'total_emails': 0, 'quality_score': 0, 'business_emails': 0}
-        
-        business_emails = 0
-        personal_emails = 0
-        suspicious_emails = 0
-        executive_emails = 0
-        
-        for email_item in emails:
-            email = email_item.get('value', '').lower()
-            
-            # Check business vs personal
-            if any(domain in email for domain in self.email_patterns['personal_domains']):
-                personal_emails += 1
-            else:
-                business_emails += 1
-            
-            # Check for suspicious patterns
-            if any(pattern in email for pattern in self.email_patterns['suspicious_patterns']):
-                suspicious_emails += 1
-            
-            # Check for executive patterns
-            if any(pattern in email for pattern in self.email_patterns['executive_patterns']):
-                executive_emails += 1
-        
-        quality_score = (business_emails * 0.8 + executive_emails * 1.0 - suspicious_emails * 0.5) / len(emails)
-        quality_score = max(0, min(1, quality_score))
-        
-        return {
-            'total_emails': len(emails),
-            'business_emails': business_emails,
-            'personal_emails': personal_emails,
-            'executive_emails': executive_emails,
-            'suspicious_emails': suspicious_emails,
-            'quality_score': quality_score
-        }
-    
-    def _analyze_phones(self, contact_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze phone number quality"""
-        phones = [item for item in contact_data if item.get('type') == 'phone']
-        
-        if not phones:
-            return {'total_phones': 0, 'quality_score': 0, 'mobile_count': 0}
-        
-        mobile_count = 0
-        landline_count = 0
-        international_count = 0
-        valid_format_count = 0
-        
-        for phone_item in phones:
-            phone = phone_item.get('value', '').strip()
-            
-            # Clean phone number
-            cleaned_phone = re.sub(r'[^\d+]', '', phone)
-            
-            # Check patterns
-            if self.phone_patterns['saudi_mobile'].match(cleaned_phone):
-                mobile_count += 1
-                valid_format_count += 1
-            elif self.phone_patterns['saudi_landline'].match(cleaned_phone):
-                landline_count += 1
-                valid_format_count += 1
-            elif self.phone_patterns['uae_mobile'].match(cleaned_phone):
-                mobile_count += 1
-                valid_format_count += 1
-            elif self.phone_patterns['international'].match(cleaned_phone):
-                international_count += 1
-                valid_format_count += 1
-        
-        quality_score = valid_format_count / len(phones) if phones else 0
-        
-        return {
-            'total_phones': len(phones),
-            'mobile_count': mobile_count,
-            'landline_count': landline_count,
-            'international_count': international_count,
-            'valid_format_count': valid_format_count,
-            'quality_score': quality_score
-        }
-    
-    def _calculate_overall_quality(self, email_analysis: Dict, phone_analysis: Dict) -> float:
-        """Calculate overall contact quality score"""
-        email_weight = 0.6
-        phone_weight = 0.4
-        
-        email_score = email_analysis.get('quality_score', 0) * email_weight
-        phone_score = phone_analysis.get('quality_score', 0) * phone_weight
-        
-        return email_score + phone_score
-    
-    def _determine_best_contact_methods(self, email_analysis: Dict, phone_analysis: Dict) -> List[str]:
-        """Determine best contact methods"""
-        methods = []
-        
-        if email_analysis.get('business_emails', 0) > 0:
-            methods.append('business_email')
-        
-        if email_analysis.get('executive_emails', 0) > 0:
-            methods.append('executive_email')
-        
-        if phone_analysis.get('mobile_count', 0) > 0:
-            methods.append('mobile_phone')
-        
-        if phone_analysis.get('landline_count', 0) > 0:
-            methods.append('office_phone')
-        
-        return methods if methods else ['general_inquiry']
-    
-    def _identify_verified_contacts(self, contact_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Identify high-confidence verified contacts"""
-        verified = []
-        
-        for contact in contact_data:
-            confidence = contact.get('confidence', 0)
-            contact_type = contact.get('type', '')
-            
-            # High confidence threshold
-            if confidence >= 0.8:
-                verified.append({
-                    'type': contact_type,
-                #!/usr/bin/env python3
-"""
-Advanced AI Intelligence Analyzer
-File Location: core/ai_analyzer.py
-AI-Powered Analysis and Intelligent Documentation System
-"""
-
-import re
-import json
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-from collections import Counter, defaultdict
-import logging
-from pathlib import Path
-import statistics
-
-# Text processing and AI libraries
-try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class IntelligenceAnalysis:
-    """Comprehensive intelligence analysis result"""
-    investigation_id: str
-    target_identifier: str
-    analysis_timestamp: datetime
-    
-    # Business Analysis
-    business_type: str
-    business_confidence: float
-    industry_classification: str
-    company_size_estimate: str
-    target_audience_type: str  # B2B, B2C, Government, Mixed
-    
-    # Geographic Analysis
-    geographic_distribution: Dict[str, int]
-    primary_location: str
-    secondary_locations: List[str]
-    geographic_coverage: str  # Local, Regional, National, International
-    
-    # Personnel Analysis
-    decision_makers: List[Dict[str, Any]]
-    key_personnel: List[Dict[str, Any]]
-    organizational_structure: Dict[str, Any]
-    personnel_count_estimate: int
-    
-    # Contact Intelligence
-    contact_quality_scores: Dict[str, float]
-    verified_contacts: List[Dict[str, Any]]
-    contact_channels: List[str]
-    best_contact_methods: List[str]
-    
-    # Market Intelligence
-    competitive_landscape: Dict[str, Any]
-    market_position: str
-    growth_indicators: List[str]
-    business_opportunities: List[str]
-    
-    # Technology & Digital Presence
-    technology_stack: List[str]
-    digital_maturity: str
-    online_presence_strength: float
-    social_media_activity: Dict[str, Any]
-    
-    # Risk Assessment
-    data_quality_score: float
-    information_completeness: float
-    verification_status: Dict[str, str]
-    confidence_factors: List[str]
-    risk_indicators: List[str]
-    
-    # Insights and Recommendations
-    key_insights: List[str]
-    actionable_recommendations: List[str]
-    follow_up_opportunities: List[str]
-    intelligence_gaps: List[str]
-    
-    # Metadata
-    total_data_points: int
-    sources_analyzed: List[str]
-    analysis_methods_used: List[str]
-    processing_time_seconds: float
-
-class BusinessTypeClassifier:
-    """AI-
+    asyncio.run(test_ai_analyzer())

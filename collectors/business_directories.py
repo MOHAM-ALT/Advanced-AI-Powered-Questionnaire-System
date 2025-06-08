@@ -8,27 +8,43 @@ This package contains specialized collectors for gathering intelligence from var
 - business_directories: Business listings and directories
 - job_portals: Job sites and professional networks
 - specialized_tools: Technical analysis tools
+
+Modules:
+- IntelligentSearchCollector: Advanced search engine data collection
+- SocialMediaIntelligenceCollector: Social media intelligence gathering
+- BusinessDirectoryCollector: Business directory data collection
+- JobPortalsCollector: Professional network data collection
+- SpecializedToolsCollector: Technical analysis tools integration
 """
 
 from .search_engines import IntelligentSearchCollector
 from .social_media import SocialMediaIntelligenceCollector
+from .business_directories import BusinessDirectoryCollector
+from .job_portals import JobPortalsCollector
+from .specialized_tools import SpecializedToolsCollector
 
 __all__ = [
     'IntelligentSearchCollector',
-    'SocialMediaIntelligenceCollector'
+    'SocialMediaIntelligenceCollector',
+    'BusinessDirectoryCollector',
+    'JobPortalsCollector',
+    'SpecializedToolsCollector'
 ]
 
 # ============================================================================
 # collectors/business_directories.py - جامع أدلة الأعمال
 # ============================================================================
 
-import asyncio
-import aiohttp
-import random
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
 import logging
+import asyncio
+import aiohttp
+import random
+
+from ..utils.validation import ValidationRules
+from ..utils.patterns import SearchPatterns
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +68,8 @@ class BusinessDirectoryCollector:
     """Business directory intelligence collector"""
     
     def __init__(self):
+        self.validation = ValidationRules()
+        self.patterns = SearchPatterns()
         self.directories = {
             'google_business': 'https://www.google.com/maps',
             'yelp': 'https://www.yelp.com',
@@ -205,7 +223,7 @@ class JobPortalProfile:
     name: str
     title: str
     skills: List[str]
-    experience_years: int
+    experience_years
     location: str
     education: str
     current_status: str  # "looking", "open", "employed"
@@ -380,12 +398,7 @@ class JobPortalsCollector:
         base_skills = skill_sets.get(job_role, ['Communication', 'Problem Solving'])
         return random.sample(base_skills, min(len(base_skills), random.randint(3, 6)))
     
-    def _generate_resume_keywords(self, target: str, job_role: str) -> List[str]:
-        """Generate resume keywords based on target and role"""
-        keywords = [job_role, 'professional', 'experienced']
-        
-        # Add target-specific keywords
-        target_words = target.lower().split()
+    def _generate_resume_keywords(self, target: str,
         keywords.extend([word for word in target_words if len(word) > 3])
         
         # Add role-specific keywords
@@ -746,7 +759,7 @@ async def test_complete_system():
     # Test questionnaire data
     questionnaire_data = {
         'context': 'lead_generation',
-        'data_priorities': ['contact_info', 'decision_makers', '# ============================================================================
+        'data_priorities': 'contact_info', 'decision_makers', '# ============================================================================
 # utils/rate_limiter.py - تحديد معدل الطلبات المحسن
 # ============================================================================
 
@@ -1112,218 +1125,90 @@ logger = logging.getLogger(__name__)
 class ValidationRules:
     """Advanced validation rules for OSINT data"""
     
+    WEIGHTS = {
+        'completeness': 0.6,
+        'consistency': 0.4
+    }
+    
     def __init__(self):
         self.patterns = SearchPatterns()
         self.domain_cache = {}
-        
-    def validate_email(self, email: str) -> Dict[str, any]:
-        """Comprehensive email validation"""
-        result = {
-            'valid': False,
-            'confidence': 0.0,
-            'format_valid': False,
-            'domain_valid': False,
-            'mx_record_exists': False,
-            'business_email': False,
-            'risk_indicators': []
-        }
-        
-        if not email or not isinstance(email, str):
-            return result
-        
-        email = email.strip().lower()
-        
-        # Format validation
-        if self.patterns.validation_patterns['email'].match(email):
-            result['format_valid'] = True
-            result['confidence'] += 0.3
-        else:
-            result['risk_indicators'].append('Invalid email format')
-            return result
-        
-        # Extract domain
-        domain = email.split('@')[1] if '@' in email else None
-        if not domain:
-            return result
-        
-        # Domain validation
-        if validators.domain(domain):
-            result['domain_valid'] = True
-            result['confidence'] += 0.2
-        else:
-            result['risk_indicators'].append('Invalid domain format')
-        
-        # MX record check
-        try:
-            mx_records = dns.resolver.resolve(domain, 'MX')
-            if mx_records:
-                result['mx_record_exists'] = True
-                result['confidence'] += 0.3
-        except Exception as e:
-            result['risk_indicators'].append('No MX record found')
-            logger.debug(f"MX lookup failed for {domain}: {e}")
-        
-        # Business email detection
-        personal_domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com']
-        if domain not in personal_domains:
-            result['business_email'] = True
-            result['confidence'] += 0.2
-        
-        # Suspicious patterns
-        suspicious_patterns = ['noreply', 'donotreply', 'test', 'temp', 'fake']
-        if any(pattern in email for pattern in suspicious_patterns):
-            result['risk_indicators'].append('Suspicious email pattern')
-            result['confidence'] = max(0, result['confidence'] - 0.3)
-        
-        result['valid'] = result['confidence'] >= 0.5
-        return result
+        self._init_validation_configs()
     
-    def validate_phone(self, phone: str, region: str = 'international') -> Dict[str, any]:
-        """Comprehensive phone number validation"""
-        result = {
-            'valid': False,
-            'confidence': 0.0,
-            'format_valid': False,
-            'region_detected': None,
-            'type': None,  # mobile, landline
-            'risk_indicators': []
+    def _init_validation_configs(self):
+        """Initialize validation configurations"""
+        self.required_fields = ['name', 'industry', 'location']
+        self.personal_domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com']
+        self.suspicious_patterns = ['noreply', 'donotreply', 'test', 'temp', 'fake']
+        self.suspicious_tlds = ['.tk', '.ml', '.ga', '.cf']
+        self.confidence_weights = {
+            'format': 0.3,
+            'domain': 0.2,
+            'mx_record': 0.3,
+            'business_email': 0.2
         }
-        
-        if not phone or not isinstance(phone, str):
-            return result
-        
-        # Clean phone number
-        cleaned_phone = re.sub(r'[^\d+]', '', phone.strip())
-        
-        # Regional validation
-        if region == 'saudi' or self.patterns.validation_patterns['phone_saudi'].match(cleaned_phone):
-            result['format_valid'] = True
-            result['region_detected'] = 'saudi'
-            result['type'] = 'mobile'
-            result['confidence'] = 0.9
-        elif region == 'uae' or self.patterns.validation_patterns['phone_uae'].match(cleaned_phone):
-            result['format_valid'] = True
-            result['region_detected'] = 'uae'
-            result['type'] = 'mobile'
-            result['confidence'] = 0.9
-        elif self.patterns.validation_patterns['phone_international'].match(cleaned_phone):
-            result['format_valid'] = True
-            result['region_detected'] = 'international'
-            result['confidence'] = 0.7
-        else:
-            result['risk_indicators'].append('Invalid phone format')
-            return result
-        
-        # Length validation
-        if len(cleaned_phone) < 8:
-            result['risk_indicators'].append('Phone number too short')
-            result['confidence'] -= 0.2
-        elif len(cleaned_phone) > 15:
-            result['risk_indicators'].append('Phone number too long')
-            result['confidence'] -= 0.1
-        
-        result['valid'] = result['confidence'] >= 0.5
-        return result
-    
-    def validate_domain(self, domain: str) -> Dict[str, any]:
-        """Comprehensive domain validation"""
-        result = {
-            'valid': False,
-            'confidence': 0.0,
-            'format_valid': False,
-            'dns_resolves': False,
-            'has_mx_record': False,
-            'ssl_certificate': False,
-            'risk_indicators': []
-        }
-        
-        if not domain or not isinstance(domain, str):
-            return result
-        
-        domain = domain.strip().lower()
-        
-        # Format validation
-        if validators.domain(domain):
-            result['format_valid'] = True
-            result['confidence'] += 0.3
-        else:
-            result['risk_indicators'].append('Invalid domain format')
-            return result
-        
-        # DNS resolution
-        try:
-            dns.resolver.resolve(domain, 'A')
-            result['dns_resolves'] = True
-            result['confidence'] += 0.4
-        except Exception as e:
-            result['risk_indicators'].append('Domain does not resolve')
-            logger.debug(f"DNS resolution failed for {domain}: {e}")
-        
-        # MX record check
-        try:
-            mx_records = dns.resolver.resolve(domain, 'MX')
-            if mx_records:
-                result['has_mx_record'] = True
-                result['confidence'] += 0.2
-        except Exception:
-            pass
-        
-        # Suspicious domain indicators
-        suspicious_tlds = ['.tk', '.ml', '.ga', '.cf']
-        if any(domain.endswith(tld) for tld in suspicious_tlds):
-            result['risk_indicators'].append('Suspicious TLD')
-            result['confidence'] -= 0.3
-        
-        result['valid'] = result['confidence'] >= 0.5
-        return result
     
     def validate_business_info(self, business_data: Dict[str, any]) -> Dict[str, any]:
         """Validate business information consistency"""
-        result = {
+        result = self._init_validation_result()
+        
+        if not business_data:
+            return result
+        
+        # Calculate completeness score
+        result['completeness_score'] = self._calculate_completeness(business_data)
+        
+        # Calculate consistency score
+        consistency_data = self._check_consistency(business_data)
+        result['consistency_score'] = consistency_data['score']
+        
+        # Calculate overall confidence
+        result['confidence'] = self._calculate_confidence(
+            result['completeness_score'], 
+            result['consistency_score']
+        )
+        result['valid'] = result['confidence'] >= 0.6
+        
+        return result
+    
+    def _init_validation_result(self) -> Dict[str, any]:
+        """Initialize validation result structure"""
+        return {
             'valid': False,
             'confidence': 0.0,
             'consistency_score': 0.0,
             'completeness_score': 0.0,
             'risk_indicators': []
         }
-        
-        if not business_data:
-            return result
-        
-        # Check required fields
-        required_fields = ['name', 'industry', 'location']
-        present_fields = sum(1 for field in required_fields if business_data.get(field))
-        result['completeness_score'] = present_fields / len(required_fields)
-        
-        # Consistency checks
-        consistency_checks = 0
-        total_checks = 0
-        
-        # Name consistency
-        if business_data.get('name') and business_data.get('domain'):
-            total_checks += 1
-            name_words = set(business_data['name'].lower().split())
-            domain_words = set(business_data['domain'].replace('.', ' ').split())
-            if name_words.intersection(domain_words):
-                consistency_checks += 1
-        
-        # Location consistency
-        if business_data.get('location') and business_data.get('phone'):
-            total_checks += 1
-            location = business_data['location'].lower()
-            phone = business_data['phone']
-            
-            # Check if phone region matches location
-            if 'saudi' in location and self.patterns.validation_patterns['phone_saudi'].search(phone):
-                consistency_checks += 1
-            elif 'uae' in location and self.patterns.validation_patterns['phone_uae'].search(phone):
-                consistency_checks += 1
-        
-        if total_checks > 0:
-            result['consistency_score'] = consistency_checks / total_checks
-        
-        # Calculate overall confidence
-        result['confidence'] = (result['completeness_score'] * 0.6 + result['consistency_score'] * 0.4)
-        result['valid'] = result['confidence'] >= 0.6
-        
-        return result
+    
+    def _calculate_completeness(self, data: Dict[str, any]) -> float:
+        """Calculate data completeness score"""
+        present_fields = sum(1 for field in self.required_fields if data.get(field))
+        return present_fields / len(self.required_fields)
+    
+    def _check_consistency(self, data: Dict[str, str], pattern_type: str) -> bool:
+        """Generic consistency checker"""
+        try:
+            if pattern_type == 'name_domain':
+                first = set(data['name'].lower().split())
+                second = set(data['domain'].replace('.', ' ').split())
+            elif pattern_type == 'location_phone':
+                location = data['location'].lower()
+                phone = data['phone']
+                return any(
+                    loc in location and self.patterns.validation_patterns[f'phone_{loc}'].search(phone)
+                    for loc in ['saudi', 'uae']
+                )
+            return bool(first.intersection(second))
+        except (KeyError, AttributeError):
+            return False
+    
+    def _calculate_confidence(self, scores: Dict[str, float]) -> float:
+        """Calculate weighted confidence score"""
+        return sum(
+            score * self.WEIGHTS.get(metric, 0)
+            for metric, score in scores.items()
+        )
+
+
+
