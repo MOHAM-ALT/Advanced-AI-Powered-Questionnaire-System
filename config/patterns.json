@@ -1,0 +1,368 @@
+{
+  "google_dorks": {
+    "contact_discovery": [
+      "site:{domain} \"contact\" OR \"email\" OR \"phone\" OR \"call us\"",
+      "site:{domain} \"@{domain}\" -www",
+      "site:{domain} filetype:pdf \"contact\" OR \"directory\"",
+      "\"{company}\" \"email\" OR \"contact\" -site:{domain}",
+      "\"{company}\" \"@\" site:linkedin.com",
+      "site:{domain} \"staff\" OR \"team\" OR \"employees\"",
+      "site:{domain} \"about us\" OR \"meet the team\"",
+      "site:{domain} intitle:\"contact\" OR intitle:\"directory\"",
+      "site:{domain} \"phone:\" OR \"tel:\" OR \"mobile:\"",
+      "site:{domain} \"address\" OR \"location\" OR \"office\""
+    ],
+    "employee_discovery": [
+      "\"{company}\" site:linkedin.com/in/",
+      "\"{company}\" \"manager\" OR \"director\" OR \"CEO\" OR \"CTO\"",
+      "\"{company}\" \"@{domain}\" site:linkedin.com",
+      "\"{company}\" \"works at\" OR \"employee\" site:facebook.com",
+      "\"{company}\" \"team member\" OR \"staff\"",
+      "site:{domain} \"bio\" OR \"biography\" OR \"profile\"",
+      "\"{company}\" site:twitter.com \"CEO\" OR \"founder\"",
+      "\"{company}\" \"executive\" OR \"leadership\"",
+      "site:{domain} \"management\" OR \"board of directors\"",
+      "\"{company}\" \"joins\" OR \"appointed\" OR \"promoted\""
+    ],
+    "business_intelligence": [
+      "\"{company}\" \"revenue\" OR \"employees\" OR \"funding\" OR \"valuation\"",
+      "\"{company}\" \"CEO\" OR \"founder\" OR \"president\" OR \"owner\"",
+      "\"{company}\" \"office\" OR \"headquarters\" OR \"location\"",
+      "\"{company}\" \"news\" OR \"press release\" OR \"announcement\"",
+      "\"{company}\" \"partnership\" OR \"acquisition\" OR \"merger\"",
+      "site:{domain} \"investor\" OR \"funding\" OR \"capital\"",
+      "\"{company}\" \"annual report\" filetype:pdf",
+      "\"{company}\" \"awards\" OR \"recognition\" OR \"certification\"",
+      "\"{company}\" \"clients\" OR \"customers\" OR \"portfolio\"",
+      "\"{company}\" \"services\" OR \"products\" OR \"solutions\""
+    ],
+    "service_discovery": [
+      "\"{service_type}\" \"{location}\" \"contact\" OR \"phone\"",
+      "\"{service_type}\" \"{location}\" \"directory\" OR \"list\"",
+      "site:yellowpages.com \"{service_type}\" \"{location}\"",
+      "site:yelp.com \"{service_type}\" \"{location}\"",
+      "\"{service_type}\" \"{location}\" \"company\" OR \"business\"",
+      "intitle:\"{service_type}\" \"{location}\" contact",
+      "\"{service_type}\" \"{location}\" \"reviews\" OR \"rating\"",
+      "\"{service_type}\" \"{location}\" \"best\" OR \"top\"",
+      "\"{service_type}\" \"{location}\" \"professional\" OR \"certified\"",
+      "\"{service_type}\" \"{location}\" \"24/7\" OR \"emergency\""
+    ],
+    "job_related": [
+      "\"{job_title}\" \"{location}\" \"resume\" OR \"CV\"",
+      "site:linkedin.com \"{job_title}\" \"{location}\" \"seeking\"",
+      "site:indeed.com \"{job_title}\" \"{location}\"",
+      "\"{job_title}\" \"{location}\" \"available\" OR \"looking for\"",
+      "site:bayt.com \"{job_title}\" \"{location}\"",
+      "\"looking for work\" \"{job_title}\" \"{location}\"",
+      "\"{job_title}\" \"unemployed\" \"{location}\"",
+      "\"{job_title}\" \"freelancer\" \"{location}\"",
+      "\"{job_title}\" \"contractor\" \"{location}\"",
+      "\"{job_title}\" \"consultant\" \"{location}\""
+    ],
+    "social_media_discovery": [
+      "\"{company}\" site:facebook.com",
+      "\"{company}\" site:twitter.com",
+      "\"{company}\" site:instagram.com", 
+      "\"{company}\" site:youtube.com",
+      "\"{company}\" site:tiktok.com",
+      "site:linkedin.com/company/{company}",
+      "\"{company}\" \"follow us\" social",
+      "\"{company}\" \"@\" social media",
+      "\"{company}\" \"facebook.com\" OR \"twitter.com\"",
+      "\"{company}\" \"social\" \"media\" \"accounts\""
+    ],
+    "document_discovery": [
+      "site:{domain} filetype:pdf \"directory\" OR \"staff\"",
+      "site:{domain} filetype:doc OR filetype:docx \"contact\"",
+      "site:{domain} filetype:xls OR filetype:xlsx \"employees\"",
+      "\"{company}\" filetype:pdf \"organization chart\"",
+      "site:{domain} filetype:ppt OR filetype:pptx \"team\"",
+      "site:{domain} filetype:pdf \"annual report\"",
+      "\"{company}\" filetype:pdf \"brochure\" OR \"catalog\"",
+      "site:{domain} filetype:pdf \"manual\" OR \"guide\"",
+      "\"{company}\" filetype:pdf \"price list\" OR \"pricing\"",
+      "site:{domain} filetype:pdf \"newsletter\" OR \"update\""
+    ],
+    "vulnerability_discovery": [
+      "site:{domain} \"admin\" OR \"login\" OR \"dashboard\"",
+      "site:{domain} \"database\" OR \"db\" OR \"sql\"",
+      "site:{domain} \"config\" OR \"configuration\"",
+      "site:{domain} \"backup\" OR \"test\" OR \"dev\"",
+      "site:{domain} intitle:\"index of\"",
+      "site:{domain} \"password\" OR \"passwd\"",
+      "site:{domain} \"error\" OR \"exception\"",
+      "site:{domain} \"debug\" OR \"trace\"",
+      "site:{domain} \"api\" \"key\" OR \"token\"",
+      "site:{domain} \"private\" OR \"confidential\""
+    ],
+    "news_monitoring": [
+      "\"{company}\" \"news\" site:reuters.com",
+      "\"{company}\" \"announcement\" site:bloomberg.com",
+      "\"{company}\" \"press release\" recent",
+      "\"{company}\" \"breaking\" OR \"latest\"",
+      "\"{company}\" \"industry\" \"news\"",
+      "\"{company}\" \"market\" \"update\"",
+      "\"{company}\" \"financial\" \"results\"",
+      "\"{company}\" \"expansion\" OR \"growth\"",
+      "\"{company}\" \"contract\" OR \"deal\"",
+      "\"{company}\" \"award\" OR \"recognition\""
+    ]
+  },
+  "validation_patterns": {
+    "email": {
+      "pattern": "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b",
+      "flags": ["IGNORECASE"],
+      "description": "Standard email address validation"
+    },
+    "phone_saudi": {
+      "pattern": "(?:\\+966|966|0)?(?:5[0-9])\\d{7}\\b",
+      "flags": [],
+      "description": "Saudi Arabia mobile phone numbers"
+    },
+    "phone_saudi_landline": {
+      "pattern": "(?:\\+966|966|0)?(?:[1-4][0-9])\\d{6}\\b",
+      "flags": [],
+      "description": "Saudi Arabia landline numbers"
+    },
+    "phone_uae": {
+      "pattern": "(?:\\+971|971|0)?(?:5[0-9])\\d{7}\\b",
+      "flags": [],
+      "description": "UAE mobile phone numbers"
+    },
+    "phone_qatar": {
+      "pattern": "(?:\\+974|974)?[3567][0-9]{7}\\b",
+      "flags": [],
+      "description": "Qatar phone numbers"
+    },
+    "phone_kuwait": {
+      "pattern": "(?:\\+965|965)?[569][0-9]{7}\\b",
+      "flags": [],
+      "description": "Kuwait phone numbers"
+    },
+    "phone_international": {
+      "pattern": "\\+?[1-9]\\d{1,14}\\b",
+      "flags": [],
+      "description": "International phone number format"
+    },
+    "domain": {
+      "pattern": "\\b(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}\\b",
+      "flags": [],
+      "description": "Domain name validation"
+    },
+    "url": {
+      "pattern": "https?://(?:[-\\w.])+(?:\\:[0-9]+)?(?:/(?:[\\w/_.])*(?:\\?(?:[\\w&=%.])*)?(?:\\#(?:[\\w.])*)?)?",
+      "flags": [],
+      "description": "HTTP/HTTPS URL validation"
+    },
+    "ip_address": {
+      "pattern": "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b",
+      "flags": [],
+      "description": "IPv4 address validation"
+    },
+    "social_security_saudi": {
+      "pattern": "[1-2][0-9]{9}",
+      "flags": [],
+      "description": "Saudi national ID format"
+    }
+  },
+  "extraction_patterns": {
+    "linkedin_profiles": {
+      "company": "linkedin\\.com/company/([\\w-]+)",
+      "personal": "linkedin\\.com/in/([\\w-]+)",
+      "description": "Extract LinkedIn profile URLs"
+    },
+    "social_media": {
+      "twitter": "twitter\\.com/([\\w-]+)",
+      "facebook": "facebook\\.com/([\\w.-]+)",
+      "instagram": "instagram\\.com/([\\w.-]+)",
+      "youtube": "youtube\\.com/(?:channel/|user/|c/)([\\w-]+)",
+      "github": "github\\.com/([\\w-]+)",
+      "description": "Extract social media profile URLs"
+    },
+    "business_identifiers": {
+      "commercial_registration": "CR[\\s-]?\\d{10}",
+      "tax_number": "\\d{15}",
+      "vat_number": "\\d{15}",
+      "description": "Extract business registration numbers"
+    },
+    "financial_information": {
+      "iban": "SA\\d{2}\\s?\\d{4}\\s?\\d{4}\\s?\\d{4}\\s?\\d{4}\\s?\\d{4}",
+      "bank_account": "\\d{10,16}",
+      "description": "Extract financial account information"
+    },
+    "geographic_coordinates": {
+      "latitude": "[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)",
+      "longitude": "[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)",
+      "description": "Extract GPS coordinates"
+    }
+  },
+  "classification_patterns": {
+    "business_types": {
+      "technology": [
+        "software", "tech", "IT", "digital", "app", "platform", "AI", 
+        "machine learning", "cloud", "SaaS", "development", "programming"
+      ],
+      "healthcare": [
+        "medical", "health", "clinic", "hospital", "pharmaceutical", 
+        "biotech", "healthcare", "medicine", "dental", "pharmacy"
+      ],
+      "finance": [
+        "financial", "bank", "investment", "insurance", "fintech", 
+        "payments", "trading", "capital", "accounting", "audit"
+      ],
+      "retail": [
+        "retail", "store", "shop", "ecommerce", "shopping", "consumer", 
+        "merchandise", "fashion", "clothing", "supermarket"
+      ],
+      "hospitality": [
+        "hotel", "restaurant", "tourism", "travel", "hospitality", 
+        "leisure", "resort", "cafe", "catering", "entertainment"
+      ],
+      "manufacturing": [
+        "manufacturing", "industrial", "production", "factory", 
+        "supply chain", "logistics", "assembly", "processing"
+      ],
+      "education": [
+        "education", "school", "university", "training", "learning", 
+        "academic", "research", "institute", "college"
+      ],
+      "construction": [
+        "construction", "building", "real estate", "property", 
+        "development", "architecture", "engineering", "contractor"
+      ],
+      "automotive": [
+        "automotive", "car", "vehicle", "auto", "transportation", 
+        "dealership", "garage", "repair", "parts"
+      ],
+      "energy": [
+        "energy", "oil", "gas", "renewable", "utilities", "power", 
+        "solar", "wind", "electricity", "petroleum"
+      ]
+    },
+    "job_titles": {
+      "executive": [
+        "CEO", "chief executive", "president", "founder", "chairman", 
+        "managing director", "executive director"
+      ],
+      "senior_management": [
+        "CTO", "CFO", "COO", "chief", "vice president", "VP", 
+        "senior vice president", "SVP"
+      ],
+      "management": [
+        "director", "head of", "manager", "senior manager", 
+        "team lead", "department head", "coordinator"
+      ],
+      "technical": [
+        "engineer", "developer", "architect", "analyst", "specialist", 
+        "technician", "consultant", "researcher"
+      ],
+      "sales_marketing": [
+        "sales", "marketing", "business development", "account manager", 
+        "sales representative", "marketing manager"
+      ],
+      "operations": [
+        "operations", "production", "manufacturing", "logistics", 
+        "supply chain", "quality", "process"
+      ]
+    },
+    "company_sizes": {
+      "startup": [
+        "startup", "founded", "new", "emerging", "early stage", 
+        "seed", "series A", "Series B"
+      ],
+      "small": [
+        "small business", "SME", "family business", "local", 
+        "boutique", "independent"
+      ],
+      "medium": [
+        "growing", "expanding", "medium", "regional", "multi-location"
+      ],
+      "large": [
+        "enterprise", "corporation", "multinational", "global", 
+        "Fortune", "publicly traded", "listed company"
+      ]
+    }
+  },
+  "geographic_patterns": {
+    "saudi_cities": [
+      "Riyadh", "الرياض", "Jeddah", "جدة", "Mecca", "مكة", "Medina", "المدينة", 
+      "Dammam", "الدمام", "Khobar", "الخبر", "Taif", "الطائف", "Buraidah", "بريدة",
+      "Tabuk", "تبوك", "Hail", "حائل", "Abha", "أبها", "Najran", "نجران"
+    ],
+    "uae_cities": [
+      "Dubai", "دبي", "Abu Dhabi", "أبوظبي", "Sharjah", "الشارقة", 
+      "Ajman", "عجمان", "Ras Al Khaimah", "رأس الخيمة", "Fujairah", "الفجيرة"
+    ],
+    "gcc_countries": [
+      "Saudi Arabia", "المملكة العربية السعودية", "UAE", "الإمارات",
+      "Qatar", "قطر", "Kuwait", "الكويت", "Bahrain", "البحرين", "Oman", "عمان"
+    ],
+    "address_indicators": [
+      "street", "road", "avenue", "building", "floor", "office", 
+      "P.O. Box", "postal code", "zip", "district", "area", "zone"
+    ]
+  },
+  "language_patterns": {
+    "arabic_text": {
+      "pattern": "[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]+",
+      "description": "Detect Arabic text"
+    },
+    "english_text": {
+      "pattern": "[A-Za-z\\s]+",
+      "description": "Detect English text"
+    },
+    "mixed_language": {
+      "indicators": ["both Arabic and English characters present"],
+      "description": "Detect mixed language content"
+    }
+  },
+  "quality_indicators": {
+    "high_quality": [
+      "verified", "official", "certified", "registered", "licensed", 
+      "accredited", "recognized", "established", "professional"
+    ],
+    "medium_quality": [
+      "business", "company", "organization", "service", "provider", 
+      "agency", "firm", "group", "center"
+    ],
+    "low_quality": [
+      "test", "temp", "temporary", "fake", "dummy", "example", 
+      "sample", "placeholder", "lorem ipsum"
+    ],
+    "suspicious": [
+      "spam", "scam", "fraud", "phishing", "malware", "virus", 
+      "hack", "illegal", "blacklist", "suspicious"
+    ]
+  },
+  "temporal_patterns": {
+    "date_formats": [
+      "\\d{4}-\\d{2}-\\d{2}",
+      "\\d{2}/\\d{2}/\\d{4}",
+      "\\d{2}-\\d{2}-\\d{4}",
+      "\\d{1,2}\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+\\d{4}"
+    ],
+    "time_indicators": [
+      "today", "yesterday", "last week", "last month", "recently", 
+      "new", "latest", "current", "now", "real-time"
+    ],
+    "business_hours": {
+      "pattern": "\\d{1,2}:\\d{2}\\s*(AM|PM|am|pm)?\\s*-\\s*\\d{1,2}:\\d{2}\\s*(AM|PM|am|pm)?",
+      "description": "Extract business hours"
+    }
+  },
+  "contact_context": {
+    "contact_indicators": [
+      "contact", "reach", "call", "email", "phone", "tel", "fax", 
+      "address", "location", "office", "headquarters", "branch"
+    ],
+    "department_indicators": [
+      "sales", "support", "customer service", "technical", "billing", 
+      "hr", "human resources", "marketing", "finance", "legal"
+    ],
+    "urgency_indicators": [
+      "urgent", "emergency", "24/7", "immediate", "asap", "priority", 
+      "critical", "important", "deadline", "time-sensitive"
+    ]
+  }
+}

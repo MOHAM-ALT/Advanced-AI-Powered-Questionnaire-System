@@ -1,0 +1,784 @@
+{
+  "search_engines": {
+    "google": {
+      "enabled": true,
+      "name": "Google Search",
+      "base_url": "https://www.google.com/search",
+      "priority": 10,
+      "rate_limit": 10,
+      "delay_between_requests": 3,
+      "requires_proxy": true,
+      "advanced_features": {
+        "dorking": true,
+        "image_search": true,
+        "news_search": true,
+        "scholar_search": false
+      }
+  },
+  "specialized_tools": {
+    "domain_analysis": {
+      "whois_lookup": {
+        "enabled": true,
+        "name": "WHOIS Lookup",
+        "priority": 9,
+        "data_types": [
+          "domain_registration",
+          "registrant_info",
+          "nameservers",
+          "expiration_dates"
+        ]
+      },
+      "dns_analysis": {
+        "enabled": true,
+        "name": "DNS Analysis",
+        "priority": 8,
+        "record_types": ["A", "AAAA", "MX", "NS", "TXT", "CNAME", "SOA"],
+        "data_types": [
+          "ip_addresses",
+          "mail_servers",
+          "subdomains",
+          "dns_records"
+        ]
+      },
+      "subdomain_enumeration": {
+        "enabled": true,
+        "name": "Subdomain Discovery",
+        "priority": 7,
+        "methods": [
+          "dictionary_based",
+          "certificate_transparency",
+          "dns_bruteforce"
+        ]
+      },
+      "ssl_analysis": {
+        "enabled": true,
+        "name": "SSL Certificate Analysis",
+        "priority": 6,
+        "data_types": [
+          "certificate_info",
+          "issuer_details",
+          "validity_period",
+          "san_domains"
+        ]
+      }
+    },
+    "technology_detection": {
+      "web_technologies": {
+        "enabled": true,
+        "name": "Web Technology Detection",
+        "priority": 8,
+        "detection_methods": [
+          "http_headers",
+          "html_analysis",
+          "javascript_detection",
+          "css_analysis"
+        ],
+        "categories": [
+          "cms",
+          "frameworks",
+          "analytics",
+          "advertising",
+          "security"
+        ]
+      },
+      "cms_detection": {
+        "enabled": true,
+        "name": "CMS Detection",
+        "priority": 7,
+        "supported_cms": [
+          "wordpress",
+          "drupal",
+          "joomla",
+          "magento",
+          "shopify"
+        ]
+      },
+      "framework_detection": {
+        "enabled": true,
+        "name": "Framework Detection",
+        "priority": 6,
+        "supported_frameworks": [
+          "react",
+          "angular",
+          "vue",
+          "bootstrap",
+          "jquery"
+        ]
+      }
+    },
+    "threat_intelligence": {
+      "reputation_checks": {
+        "enabled": false,
+        "name": "Domain Reputation",
+        "priority": 5,
+        "sources": [
+          "virustotal",
+          "urlvoid",
+          "hybrid_analysis"
+        ]
+      },
+      "blacklist_checks": {
+        "enabled": false,
+        "name": "Blacklist Monitoring",
+        "priority": 4,
+        "blacklist_sources": [
+          "spamhaus",
+          "surbl",
+          "uribl"
+        ]
+      }
+    },
+    "osint_frameworks": {
+      "maltego": {
+        "enabled": false,
+        "name": "Maltego Integration",
+        "priority": 8,
+        "license_required": true,
+        "data_types": [
+          "entity_relationships",
+          "link_analysis",
+          "graph_visualization"
+        ]
+      },
+      "spiderfoot": {
+        "enabled": false,
+        "name": "SpiderFoot",
+        "priority": 7,
+        "open_source": true,
+        "automated_osint": true
+      },
+      "shodan": {
+        "enabled": false,
+        "name": "Shodan",
+        "priority": 9,
+        "api_required": true,
+        "data_types": [
+          "internet_exposed_devices",
+          "open_ports",
+          "service_banners",
+          "vulnerabilities"
+        ]
+      }
+    }
+  },
+  "job_portals": {
+    "linkedin_jobs": {
+      "enabled": true,
+      "name": "LinkedIn Jobs",
+      "base_url": "https://www.linkedin.com/jobs",
+      "priority": 9,
+      "professional_focus": true,
+      "data_types": [
+        "job_postings",
+        "company_hiring",
+        "salary_insights",
+        "skill_requirements"
+      ]
+    },
+    "indeed": {
+      "enabled": true,
+      "name": "Indeed",
+      "base_url": "https://www.indeed.com",
+      "priority": 8,
+      "global_coverage": true,
+      "data_types": [
+        "job_listings",
+        "company_reviews",
+        "salary_data"
+      ]
+    },
+    "glassdoor": {
+      "enabled": true,
+      "name": "Glassdoor",
+      "base_url": "https://www.glassdoor.com",
+      "priority": 7,
+      "company_insights": true,
+      "data_types": [
+        "company_reviews",
+        "salary_information",
+        "interview_insights",
+        "ceo_ratings"
+      ]
+    },
+    "regional_job_portals": {
+      "bayt": {
+        "enabled": true,
+        "name": "Bayt.com",
+        "base_url": "https://www.bayt.com",
+        "priority": 9,
+        "regional_focus": "Middle East",
+        "language_support": ["Arabic", "English"]
+      },
+      "gulftalent": {
+        "enabled": true,
+        "name": "GulfTalent",
+        "base_url": "https://www.gulftalent.com",
+        "priority": 8,
+        "regional_focus": "Gulf Region"
+      },
+      "naukrigulf": {
+        "enabled": true,
+        "name": "Naukri Gulf",
+        "base_url": "https://www.naukrigulf.com",
+        "priority": 7,
+        "regional_focus": "Gulf Region"
+      }
+    }
+  },
+  "news_sources": {
+    "international": {
+      "reuters": {
+        "enabled": true,
+        "name": "Reuters",
+        "base_url": "https://www.reuters.com",
+        "priority": 9,
+        "real_time": true,
+        "business_focus": true
+      },
+      "bloomberg": {
+        "enabled": true,
+        "name": "Bloomberg",
+        "base_url": "https://www.bloomberg.com",
+        "priority": 9,
+        "financial_focus": true
+      },
+      "bbc": {
+        "enabled": true,
+        "name": "BBC News",
+        "base_url": "https://www.bbc.com/news",
+        "priority": 8,
+        "global_coverage": true
+      },
+      "cnn": {
+        "enabled": true,
+        "name": "CNN",
+        "base_url": "https://www.cnn.com",
+        "priority": 7,
+        "breaking_news": true
+      }
+    },
+    "regional": {
+      "arab_news": {
+        "enabled": true,
+        "name": "Arab News",
+        "base_url": "https://www.arabnews.com",
+        "priority": 9,
+        "regional_focus": "Middle East",
+        "language_support": ["Arabic", "English"]
+      },
+      "gulf_news": {
+        "enabled": true,
+        "name": "Gulf News",
+        "base_url": "https://gulfnews.com",
+        "priority": 8,
+        "regional_focus": "Gulf Region"
+      },
+      "al_jazeera": {
+        "enabled": true,
+        "name": "Al Jazeera",
+        "base_url": "https://www.aljazeera.com",
+        "priority": 8,
+        "middle_east_focus": true
+      }
+    },
+    "tech_news": {
+      "techcrunch": {
+        "enabled": true,
+        "name": "TechCrunch",
+        "base_url": "https://techcrunch.com",
+        "priority": 8,
+        "startup_focus": true
+      },
+      "wired": {
+        "enabled": true,
+        "name": "Wired",
+        "base_url": "https://www.wired.com",
+        "priority": 7,
+        "technology_focus": true
+      }
+    }
+  },
+  "government_sources": {
+    "saudi_arabia": {
+      "ministry_of_commerce": {
+        "enabled": true,
+        "name": "Ministry of Commerce",
+        "base_url": "https://mc.gov.sa",
+        "priority": 10,
+        "official_data": true,
+        "data_types": [
+          "business_registrations",
+          "commercial_licenses",
+          "company_information"
+        ]
+      },
+      "tadawul": {
+        "enabled": true,
+        "name": "Saudi Stock Exchange",
+        "base_url": "https://www.tadawul.com.sa",
+        "priority": 9,
+        "financial_data": true,
+        "data_types": [
+          "listed_companies",
+          "financial_reports",
+          "stock_information"
+        ]
+      }
+    },
+    "uae": {
+      "ded": {
+        "enabled": true,
+        "name": "Dubai Economic Department",
+        "base_url": "https://www.ded.gov.ae",
+        "priority": 9,
+        "business_licensing": true
+      },
+      "adx": {
+        "enabled": true,
+        "name": "Abu Dhabi Securities Exchange",
+        "base_url": "https://www.adx.ae",
+        "priority": 8,
+        "financial_data": true
+      }
+    }
+  },
+  "api_services": {
+    "data_enrichment": {
+      "clearbit": {
+        "enabled": false,
+        "name": "Clearbit",
+        "api_required": true,
+        "paid_service": true,
+        "data_types": [
+          "company_enrichment",
+          "person_enrichment",
+          "email_verification"
+        ]
+      },
+      "hunter_io": {
+        "enabled": false,
+        "name": "Hunter.io",
+        "api_required": true,
+        "email_focus": true,
+        "data_types": [
+          "email_finder",
+          "email_verification",
+          "domain_search"
+        ]
+      }
+    },
+    "verification_services": {
+      "zerobounce": {
+        "enabled": false,
+        "name": "ZeroBounce",
+        "api_required": true,
+        "email_verification": true
+      },
+      "truecaller": {
+        "enabled": false,
+        "name": "TrueCaller",
+        "api_required": true,
+        "phone_verification": true
+      }
+    }
+  },
+  "file_sharing_sites": {
+    "document_sources": {
+      "scribd": {
+        "enabled": true,
+        "name": "Scribd",
+        "base_url": "https://www.scribd.com",
+        "priority": 6,
+        "document_search": true
+      },
+      "slideshare": {
+        "enabled": true,
+        "name": "SlideShare",
+        "base_url": "https://www.slideshare.net",
+        "priority": 5,
+        "presentation_focus": true
+      }
+    },
+    "code_repositories": {
+      "github": {
+        "enabled": true,
+        "name": "GitHub",
+        "base_url": "https://github.com",
+        "priority": 8,
+        "code_search": true,
+        "data_types": [
+          "repositories",
+          "user_profiles",
+          "organization_profiles",
+          "commit_history"
+        ]
+      },
+      "gitlab": {
+        "enabled": true,
+        "name": "GitLab",
+        "base_url": "https://gitlab.com",
+        "priority": 6,
+        "code_search": true
+      }
+    }
+  },
+  "archive_sites": {
+    "wayback_machine": {
+      "enabled": true,
+      "name": "Internet Archive Wayback Machine",
+      "base_url": "https://web.archive.org",
+      "priority": 7,
+      "historical_data": true,
+      "data_types": [
+        "website_history",
+        "historical_content",
+        "deleted_pages"
+      ]
+    },
+    "archive_today": {
+      "enabled": true,
+      "name": "Archive.today",
+      "base_url": "https://archive.today",
+      "priority": 6,
+      "snapshot_service": true
+    }
+  },
+  "leak_databases": {
+    "haveibeenpwned": {
+      "enabled": false,
+      "name": "Have I Been Pwned",
+      "base_url": "https://haveibeenpwned.com",
+      "priority": 8,
+      "email_breach_check": true,
+      "ethical_use_only": true
+    },
+    "dehashed": {
+      "enabled": false,
+      "name": "Dehashed",
+      "api_required": true,
+      "paid_service": true,
+      "ethical_use_only": true
+    }
+  },
+  "source_reliability": {
+    "tier_1": {
+      "description": "Highest reliability - Official sources",
+      "sources": [
+        "government_websites",
+        "official_company_sites",
+        "verified_social_profiles",
+        "regulatory_databases"
+      ],
+      "confidence_multiplier": 1.0
+    },
+    "tier_2": {
+      "description": "High reliability - Established platforms",
+      "sources": [
+        "linkedin",
+        "major_news_outlets", 
+        "business_directories",
+        "financial_databases"
+      ],
+      "confidence_multiplier": 0.9
+    },
+    "tier_3": {
+      "description": "Medium reliability - Public platforms",
+      "sources": [
+        "social_media",
+        "forums",
+        "review_sites",
+        "public_records"
+      ],
+      "confidence_multiplier": 0.7
+    },
+    "tier_4": {
+      "description": "Lower reliability - Unverified sources",
+      "sources": [
+        "pastebin_sites",
+        "anonymous_forums",
+        "unverified_databases"
+      ],
+      "confidence_multiplier": 0.5
+    }
+  },
+  "usage_guidelines": {
+    "ethical_considerations": [
+      "Respect robots.txt files",
+      "Implement appropriate rate limiting",
+      "Use only publicly available information",
+      "Respect terms of service",
+      "Protect personal privacy",
+      "Follow local laws and regulations"
+    ],
+    "rate_limiting": {
+      "aggressive": "High request rate, risk of blocking",
+      "moderate": "Balanced approach, recommended",
+      "conservative": "Low request rate, safer"
+    },
+    "proxy_recommendations": {
+      "required": ["google", "linkedin"],
+      "recommended": ["twitter", "facebook"],
+      "optional": ["bing", "duckduckgo"]
+    }
+  },
+  "regional_customization": {
+    "middle_east": {
+      "preferred_sources": [
+        "linkedin", 
+        "bayt", 
+        "arab_news",
+        "saudi_yellow_pages",
+        "ministry_of_commerce"
+      ],
+      "language_support": ["Arabic", "English"],
+      "cultural_considerations": [
+        "Business hours alignment",
+        "Local holiday awareness",
+        "Regional business practices"
+      ]
+    },
+    "gcc_countries": {
+      "unified_sources": [
+        "gulftalent",
+        "gulf_business",
+        "gulf_news"
+      ],
+      "country_specific": {
+        "saudi": ["tadawul", "mc.gov.sa"],
+        "uae": ["ded", "adx"],
+        "qatar": ["qse"],
+        "kuwait": ["boursakuwait"],
+        "bahrain": ["bse"],
+        "oman": ["msx"]
+      }
+    }
+  }
+},
+      "user_agents": [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+      ]
+    },
+    "bing": {
+      "enabled": true,
+      "name": "Microsoft Bing",
+      "base_url": "https://www.bing.com/search",
+      "priority": 8,
+      "rate_limit": 15,
+      "delay_between_requests": 2,
+      "requires_proxy": false,
+      "advanced_features": {
+        "business_search": true,
+        "maps_integration": true,
+        "news_search": true,
+        "academic_search": false
+      }
+    },
+    "duckduckgo": {
+      "enabled": true,
+      "name": "DuckDuckGo",
+      "base_url": "https://duckduckgo.com/",
+      "priority": 6,
+      "rate_limit": 20,
+      "delay_between_requests": 1,
+      "requires_proxy": false,
+      "privacy_focused": true,
+      "advanced_features": {
+        "instant_answers": true,
+        "bang_search": true
+      }
+    },
+    "yandex": {
+      "enabled": false,
+      "name": "Yandex",
+      "base_url": "https://yandex.com/search/",
+      "priority": 5,
+      "rate_limit": 12,
+      "regional_focus": "eastern_europe",
+      "requires_proxy": false
+    }
+  },
+  "social_platforms": {
+    "linkedin": {
+      "enabled": true,
+      "name": "LinkedIn",
+      "base_url": "https://www.linkedin.com",
+      "priority": 9,
+      "rate_limit": 5,
+      "delay_between_requests": 5,
+      "api_required": false,
+      "professional_focus": true,
+      "endpoints": {
+        "company_search": "/search/results/companies/",
+        "people_search": "/search/results/people/",
+        "jobs_search": "/search/results/jobs/"
+      },
+      "data_types": [
+        "company_profiles",
+        "employee_profiles", 
+        "job_postings",
+        "professional_networks",
+        "business_updates"
+      ]
+    },
+    "twitter": {
+      "enabled": true,
+      "name": "Twitter/X",
+      "base_url": "https://twitter.com",
+      "priority": 7,
+      "rate_limit": 15,
+      "delay_between_requests": 4,
+      "api_required": true,
+      "real_time_data": true,
+      "endpoints": {
+        "user_search": "/search",
+        "hashtag_search": "/hashtag/",
+        "advanced_search": "/search-advanced"
+      },
+      "data_types": [
+        "user_profiles",
+        "tweets",
+        "mentions",
+        "trending_topics",
+        "real_time_updates"
+      ]
+    },
+    "facebook": {
+      "enabled": true,
+      "name": "Facebook",
+      "base_url": "https://facebook.com",
+      "priority": 6,
+      "rate_limit": 10,
+      "delay_between_requests": 6,
+      "api_required": false,
+      "business_pages_focus": true,
+      "endpoints": {
+        "page_search": "/search/pages/",
+        "public_posts": "/search/posts/"
+      },
+      "data_types": [
+        "business_pages",
+        "public_posts",
+        "events",
+        "groups"
+      ]
+    },
+    "instagram": {
+      "enabled": false,
+      "name": "Instagram",
+      "base_url": "https://instagram.com",
+      "priority": 5,
+      "rate_limit": 12,
+      "api_required": true,
+      "visual_content_focus": true
+    },
+    "youtube": {
+      "enabled": true,
+      "name": "YouTube",
+      "base_url": "https://youtube.com",
+      "priority": 5,
+      "rate_limit": 15,
+      "api_required": false,
+      "data_types": [
+        "channel_profiles",
+        "video_content",
+        "playlists",
+        "comments"
+      ]
+    },
+    "github": {
+      "enabled": true,
+      "name": "GitHub",
+      "base_url": "https://github.com",
+      "priority": 6,
+      "rate_limit": 10,
+      "technical_focus": true,
+      "data_types": [
+        "user_profiles",
+        "repositories",
+        "organizations",
+        "code_analysis"
+      ]
+    }
+  },
+  "business_directories": {
+    "google_business": {
+      "enabled": true,
+      "name": "Google My Business",
+      "base_url": "https://www.google.com/maps",
+      "priority": 10,
+      "comprehensive_data": true,
+      "data_types": [
+        "business_listings",
+        "reviews",
+        "photos",
+        "business_hours",
+        "contact_information"
+      ]
+    },
+    "yelp": {
+      "enabled": true,
+      "name": "Yelp",
+      "base_url": "https://www.yelp.com",
+      "priority": 8,
+      "rate_limit": 10,
+      "review_focus": true,
+      "regional_availability": ["US", "Canada", "UK", "Australia"],
+      "data_types": [
+        "business_profiles",
+        "customer_reviews",
+        "ratings",
+        "photos",
+        "business_info"
+      ]
+    },
+    "yellowpages": {
+      "enabled": true,
+      "name": "Yellow Pages",
+      "base_url": "https://www.yellowpages.com",
+      "priority": 7,
+      "contact_focus": true,
+      "data_types": [
+        "business_listings",
+        "contact_information",
+        "categories",
+        "locations"
+      ]
+    },
+    "foursquare": {
+      "enabled": true,
+      "name": "Foursquare",
+      "base_url": "https://foursquare.com",
+      "priority": 6,
+      "location_focus": true,
+      "data_types": [
+        "venue_information",
+        "check_ins",
+        "tips",
+        "photos"
+      ]
+    },
+    "regional_directories": {
+      "saudi_yellow_pages": {
+        "enabled": true,
+        "name": "Saudi Yellow Pages",
+        "base_url": "https://www.yellowpages.com.sa",
+        "priority": 9,
+        "regional_focus": "Saudi Arabia",
+        "language_support": ["Arabic", "English"]
+      },
+      "uae_business_directory": {
+        "enabled": true,
+        "name": "UAE Business Directory",
+        "base_url": "https://www.uaebusinessdirectory.com",
+        "priority": 8,
+        "regional_focus": "UAE"
+      },
+      "gulf_business": {
+        "enabled": true,
+        "name": "Gulf Business Directory",
+        "priority": 7,
+        "regional_focus": "GCC"
+      }
+    }

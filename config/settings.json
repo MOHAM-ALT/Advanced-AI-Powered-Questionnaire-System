@@ -1,0 +1,221 @@
+{
+  "system": {
+    "version": "2.0.0",
+    "build_date": "2025-01-20",
+    "debug_mode": false,
+    "log_level": "INFO",
+    "max_concurrent_operations": 10,
+    "default_timeout": 30,
+    "enable_caching": true,
+    "cache_ttl_seconds": 3600
+  },
+  "discovery": {
+    "max_concurrent_requests": 5,
+    "request_timeout": 30,
+    "delay_between_requests": 2.0,
+    "max_retries": 3,
+    "enable_parallel_processing": true,
+    "search_depth_limits": {
+      "quick": 50,
+      "standard": 200,
+      "comprehensive": 1000
+    },
+    "quality_threshold": 0.5,
+    "confidence_threshold": 0.3
+  },
+  "data_sources": {
+    "search_engines": {
+      "google_search": {
+        "enabled": true,
+        "priority": 10,
+        "rate_limit": 10,
+        "advanced_dorking": true
+      },
+      "bing_search": {
+        "enabled": true,
+        "priority": 8,
+        "rate_limit": 15,
+        "business_focus": true
+      },
+      "duckduckgo_search": {
+        "enabled": true,
+        "priority": 6,
+        "rate_limit": 20,
+        "privacy_focused": true
+      }
+    },
+    "social_media": {
+      "linkedin": {
+        "enabled": true,
+        "priority": 9,
+        "rate_limit": 5,
+        "requires_api": false,
+        "professional_focus": true
+      },
+      "twitter": {
+        "enabled": true,
+        "priority": 7,
+        "rate_limit": 15,
+        "requires_api": true,
+        "real_time_monitoring": false
+      },
+      "facebook": {
+        "enabled": true,
+        "priority": 6,
+        "rate_limit": 10,
+        "requires_api": false,
+        "business_pages_focus": true
+      },
+      "instagram": {
+        "enabled": false,
+        "priority": 5,
+        "rate_limit": 12,
+        "requires_api": true
+      }
+    },
+    "business_directories": {
+      "google_business": {
+        "enabled": true,
+        "priority": 10,
+        "comprehensive_data": true
+      },
+      "yelp": {
+        "enabled": true,
+        "priority": 8,
+        "review_focus": true
+      },
+      "yellowpages": {
+        "enabled": true,
+        "priority": 7,
+        "contact_focus": true
+      },
+      "foursquare": {
+        "enabled": true,
+        "priority": 6,
+        "location_focus": true
+      }
+    },
+    "specialized_tools": {
+      "domain_analysis": {
+        "enabled": true,
+        "whois_lookup": true,
+        "dns_analysis": true,
+        "subdomain_enumeration": true
+      },
+      "technology_detection": {
+        "enabled": true,
+        "web_technologies": true,
+        "cms_detection": true,
+        "framework_detection": true
+      },
+      "threat_intelligence": {
+        "enabled": false,
+        "reputation_checks": false,
+        "blacklist_checks": false
+      }
+    }
+  },
+  "validation": {
+    "email_validation": {
+      "enabled": true,
+      "format_check": true,
+      "domain_check": true,
+      "mx_record_check": true,
+      "disposable_email_check": true
+    },
+    "phone_validation": {
+      "enabled": true,
+      "format_check": true,
+      "country_code_validation": true,
+      "carrier_lookup": false
+    },
+    "domain_verification": {
+      "enabled": true,
+      "dns_lookup": true,
+      "ssl_check": true,
+      "accessibility_check": false
+    },
+    "confidence_threshold": 0.7,
+    "auto_validation": true,
+    "validation_cache_enabled": true
+  },
+  "export": {
+    "default_format": "json",
+    "available_formats": ["json", "csv", "html", "xlsx"],
+    "include_metadata": true,
+    "include_confidence_scores": true,
+    "compress_exports": false,
+    "auto_backup": true,
+    "export_encryption": false,
+    "timestamp_format": "ISO",
+    "file_naming_pattern": "{investigation_type}_{target}_{timestamp}"
+  },
+  "security": {
+    "use_proxy": false,
+    "proxy_rotation": false,
+    "rotate_user_agents": true,
+    "respect_robots_txt": true,
+    "rate_limiting": true,
+    "ssl_verification": true,
+    "data_encryption": {
+      "encrypt_database": false,
+      "encrypt_exports": false,
+      "encryption_algorithm": "AES-256"
+    },
+    "privacy_protection": {
+      "anonymize_logs": false,
+      "data_retention_days": 90,
+      "auto_cleanup": true
+    }
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "data/intelligence.db",
+    "backup_enabled": true,
+    "backup_frequency": "daily",
+    "backup_retention_days": 30,
+    "optimize_frequency": "weekly",
+    "connection_pool_size": 5,
+    "query_timeout": 30,
+    "enable_wal_mode": true
+  },
+  "ai_analysis": {
+    "enabled": true,
+    "local_processing": true,
+    "confidence_threshold": 0.6,
+    "analysis_depth": "standard",
+    "business_classification": {
+      "enabled": true,
+      "confidence_threshold": 0.7,
+      "multilingual_support": true
+    },
+    "personnel_analysis": {
+      "enabled": true,
+      "decision_maker_identification": true,
+      "hierarchy_mapping": true
+    },
+    "market_intelligence": {
+      "enabled": true,
+      "competitive_analysis": true,
+      "trend_detection": true
+    }
+  },
+  "geographic_settings": {
+    "default_region": "Middle East",
+    "supported_countries": [
+      "Saudi Arabia",
+      "UAE", 
+      "Qatar",
+      "Kuwait",
+      "Bahrain",
+      "Oman"
+    ],
+    "regional_customization": {
+      "language_detection": true,
+      "local_business_directories": true,
+      "regional_phone_formats": true,
+      "cultural_context_awareness": true
+    }
+  },
+  "ui_preferences": {
+    "
